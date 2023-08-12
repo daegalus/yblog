@@ -1,0 +1,20 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        {{ range .Posts }}
+        <article class="post">
+            <h5>{{.FrontMatter.Date}}<span style="float:right">{{.Tagsline}}</span></h5>
+            <a href="/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
+            {{.Summary}} 
+            <br>
+            <a href="/{{.FrontMatter.Slug}}"><span">Read more</span></a>
+        </article>
+        {{ end }}
+
+        {{.Footer}}
+    </body>
+</html>

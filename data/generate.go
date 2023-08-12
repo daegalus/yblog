@@ -11,64 +11,72 @@ import (
 
 	"github.com/daegalus/feeds"
 	strip "github.com/grokify/html-strip-tags-go"
+	"github.com/spf13/afero"
 )
 
-func generateTemplateHTML(file string, post Post) string {
-	header, err := Content.ReadFile(file)
+type Generator struct {
+	config *Config
+	Input  afero.Fs
+	Output afero.Fs
+}
+
+func NewGenerator(config *Config, input afero.Fs, output afero.Fs) *Generator {
+	return &Generator{
+		config: config,
+		Input:  input,
+		Output: output,
+	}
+}
+
+func (gen *Generator) generateTemplateHTML(file string, post Post) string {
+	templateString, err := afero.ReadFile(gen.Input, file)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error reading template")
-		panic(err)
+		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error read template file")
 	}
 
-	tmpl, err := template.New("header").Parse(string(header))
+	tmpl, err := template.New(file).Parse(string(templateString))
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error parsing header template")
-		panic(err)
+		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error parsing template")
 	}
 
 	var buf strings.Builder
 	err = tmpl.Execute(&buf, post)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error executing header template")
-		panic(err)
+		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error executing template")
 	}
 	return buf.String()
 }
 
-func GeneratePage(post Post) string {
-	postHTML, err := Content.ReadFile("content/templates/post.html")
+func (gen *Generator) generatePost(post Post) string {
+	postHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/post.html", gen.config.Site.Theme))
 	if err != nil {
-		log.WithField("error", err).Fatal("Error reading post template")
-		panic(err)
+		log.WithField("error", err).Fatal("Error read post template")
 	}
 
 	page := Page{
-		Header: generateTemplateHTML("content/templates/header.html", post),
-		Nav:    generateTemplateHTML("content/templates/nav.html", post),
+		Header: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), post),
+		Nav:    gen.generateTemplateHTML(fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), post),
 		Posts:  []*Post{&post},
-		Footer: generateTemplateHTML("content/templates/footer.html", post),
+		Footer: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), post),
 	}
 
 	tmpl, err := template.New("page").Parse(string(postHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing post template")
-		panic(err)
 	}
 
 	var buf strings.Builder
 	err = tmpl.Execute(&buf, page)
 	if err != nil {
 		log.WithField("error", err).Fatal("Error executing post template")
-		panic(err)
 	}
 	return buf.String()
 }
 
-func GenerateIndex() string {
-	indexHTML, err := Content.ReadFile("content/templates/index.html")
+func (gen *Generator) generateIndex() string {
+	indexHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/index.html", gen.config.Site.Theme))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error reading index template")
-		panic(err)
 	}
 
 	local_posts := []*Post{}
@@ -81,29 +89,27 @@ func GenerateIndex() string {
 	})
 
 	index := Page{
-		Header: generateTemplateHTML("content/templates/header.html", Post{}),
-		Nav:    generateTemplateHTML("content/templates/nav.html", Post{}),
+		Header: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
+		Nav:    gen.generateTemplateHTML(fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
 		Posts:  local_posts,
-		Footer: generateTemplateHTML("content/templates/footer.html", Post{}),
+		Footer: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
 	}
 
 	tmpl, err := template.New("index").Parse(string(indexHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing index template")
-		panic(err)
 	}
 
 	var buf strings.Builder
 	err = tmpl.Execute(&buf, index)
 	if err != nil {
 		log.WithField("error", err).Fatal("Error executing index template")
-		panic(err)
 	}
 	return buf.String()
 }
 
 // Generate 5 line summary from the post html
-func generateSummary(post *Post) {
+func (gen *Generator) generateSummary(post *Post) {
 	strippedHTML := strip.StripTags(post.HTML)
 	splitHTML := strings.Split(strippedHTML, ".")
 	if len(splitHTML) < 5 {
@@ -113,7 +119,7 @@ func generateSummary(post *Post) {
 	post.Summary = strings.Join(splitHTML[:4], ".") + "..."
 }
 
-func generateFeeds() (string, string, string) {
+func (gen *Generator) generateFeeds() (string, string, string) {
 	feed := &feeds.Feed{
 		Title:       "my blog of thoughts and experiments",
 		Link:        &feeds.Link{Href: "https://yulian.kuncheff.com"},
@@ -171,6 +177,5 @@ func generateFeeds() (string, string, string) {
 		log.WithField("error", err).Fatal("Error generating json feed")
 	}
 
-	fmt.Println(atom[0:100])
 	return atom, rss, json
 }

@@ -1,0 +1,15 @@
+<html lang="en-us">
+  <head>
+    {{.Header}}
+  </head>
+
+  <body>
+    {{.Nav}}
+    <article class="post">
+      <h5><time>{{(index .Posts 0).FrontMatter.Date}}</time><span>{{(index .Posts 0).Tagsline}}</span></h5>
+      <h1>{{(index .Posts 0).FrontMatter.Title}}</h1>
+      <article>{{(index .Posts 0).HTML}}</article>
+    </article>
+    {{.Footer}}
+  </body>
+</html>

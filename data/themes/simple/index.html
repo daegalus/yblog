@@ -6,13 +6,13 @@
     <body>
         {{.Nav}}
         {{ range .Posts }}
-        <div class="post">
+        <article class="post">
             <h5>{{.FrontMatter.Date}}<span style="float:right">{{.Tagsline}}</span></h5>
             <a href="/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
             {{.Summary}} 
             <br>
             <a href="/{{.FrontMatter.Slug}}"><span">Read more</span></a>
-        </div>
+        </article>
         {{ end }}
 
         {{.Footer}}

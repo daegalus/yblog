@@ -20,7 +20,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-func CompileMarkdown() {
+func (gen *Generator) CompileMarkdown() {
 	log.Info("Compiling markdown")
 	md := goldmark.New(
 		goldmark.WithExtensions(
@@ -88,7 +88,7 @@ func CompileMarkdown() {
 			HTML:        out.String(),
 		}
 
-		generateSummary(&post)
+		gen.generateSummary(&post)
 
 		Posts[frontmatter.Slug] = &post
 
@@ -101,16 +101,16 @@ func CompileMarkdown() {
 			hashtags = append(hashtags, fmt.Sprintf("#%s", tag))
 		}
 		post.Tagsline = strings.Join(hashtags, " | ")
-		html := GeneratePage(post)
-		Output.MkdirAll("/posts", fs.ModeDir)
-		afero.WriteFile(Output, fmt.Sprintf("/posts/%s.html", frontmatter.Slug), []byte(html), fs.ModePerm)
+		html := gen.generatePost(post)
+		gen.Output.MkdirAll("posts", fs.ModeDir)
+		afero.WriteFile(gen.Output, fmt.Sprintf("posts/%s.html", frontmatter.Slug), []byte(html), fs.ModePerm)
 	}
 
-	html := GenerateIndex()
-	afero.WriteFile(Output, "/index.html", []byte(html), fs.ModePerm)
+	html := gen.generateIndex()
+	afero.WriteFile(gen.Output, "index.html", []byte(html), fs.ModePerm)
 
-	atom, rss, json := generateFeeds()
-	afero.WriteFile(Output, "/feed.atom", []byte(atom), fs.ModePerm)
-	afero.WriteFile(Output, "/feed.rss", []byte(rss), fs.ModePerm)
-	afero.WriteFile(Output, "/feed.json", []byte(json), fs.ModePerm)
+	atom, rss, json := gen.generateFeeds()
+	afero.WriteFile(gen.Output, "feed.atom", []byte(atom), fs.ModePerm)
+	afero.WriteFile(gen.Output, "feed.rss", []byte(rss), fs.ModePerm)
+	afero.WriteFile(gen.Output, "feed.json", []byte(json), fs.ModePerm)
 }

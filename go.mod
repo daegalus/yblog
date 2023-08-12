@@ -3,7 +3,7 @@ module yblog
 go 1.19
 
 require (
-	github.com/BurntSushi/toml v1.2.1 // indirect
+	github.com/BurntSushi/toml v1.3.2 // indirect
 	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
 	github.com/charmbracelet/lipgloss v0.6.0 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
@@ -25,6 +25,7 @@ require (
 	github.com/muesli/reflow v0.3.0 // indirect
 	github.com/muesli/termenv v0.13.1-0.20221101044243-6fd0ee9b252f // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
+	github.com/radovskyb/watcher v1.0.7 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/ugorji/go/codec v1.2.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect

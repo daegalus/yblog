@@ -3,13 +3,11 @@ package data
 import (
 	"embed"
 	"yblog/utils"
-
-	"github.com/spf13/afero"
 )
 
 //go:embed content
+//go:embed themes
 var Content embed.FS
-var Output afero.Fs
 
 type Post struct {
 	FrontMatter utils.FrontMatter
@@ -28,3 +26,9 @@ type Page struct {
 
 var Posts map[string]*Post = map[string]*Post{}
 var TaggedPosts map[string][]*Post = map[string][]*Post{}
+
+type Config struct {
+	Site struct {
+		Theme string `toml:"theme"`
+	} `toml:"site"`
+}
