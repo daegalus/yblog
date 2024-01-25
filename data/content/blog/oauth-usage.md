@@ -4,6 +4,7 @@ date: 2012-04-04T19:00:00Z
 draft: false
 slug: oauth-usage
 title: OAuth Usage
+cover_alt: OAuth Logo
 type: blog
 tags:
   - oauth
@@ -11,7 +12,7 @@ tags:
   - selectivism
 ---
 
-![oauth2](/images/2014/Jul/oauth2.png#c)
+<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
 One thing that really bugs me lately is the selective use of OAuth providers. Specifically, Facebook. It is one of my pet peeves when I come to a site that I want to try out, but they require Facebook in order to login. I rarely if ever use Facebook, I personally hate using Facebook (rant for another day), but I have one, for some basic connections and logging into places if I really have to.
 

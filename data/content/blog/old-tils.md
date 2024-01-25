@@ -25,7 +25,6 @@ So TILs didn't work out for me, I prefer longer form writing. But I might gather
 [Official IAP Documentation](https://cloud.google.com/iap/docs/authentication-howto#authenticating_from_proxy-authorization_header)
 The original post is at the more link.
 
-<!--more-->
 If you need to use basic auth when behind IAP, you can work around it by setting a custom header, and then remapping it after you get past IAP. Specifically when running NGINX Ingress on GKE.
 
 My example is for allowing Basic Auth to Jenkins while running behind IAP on GKE. I created a custom header called `X-Jenkins-Authorization`. (This can be anything, and for any service, not just jenkins).
@@ -36,10 +35,8 @@ Some official examples:
 Kubernetes Nginx Ingress configmap changes
 
 ```yaml
-...
 data:
     proxy-set-headers: `somens/nginx-proxy-headers`
-...
 ```
 
 Proxy Headers config map:

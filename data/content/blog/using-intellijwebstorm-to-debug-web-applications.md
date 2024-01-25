@@ -14,15 +14,14 @@ tags:
   - web
 ---
 
-![debug console](https://yulian.kuncheff.com/images/2013/Oct/debug_console.png#c)
+<img src="/images/${slug}/debug_console" alt="Jetbrains IntelliJ/Webstorm debug console" transform-images="avif jxl webp png" />
+
 Since I feel that the Dart Plugin in IntelliJ is at a point where it can do most, if not all things that the Dart Editor can do. I thought I would show how to setup debugging of Web Applications.
 Primarily because a certain few on IRC wanted a step-by-step guide because they were too lazy to figure it out (you know who you are..... Don). Seeing how I have been Evangelizing IntelliJ/Webstorm on
 IRC, I decided to just help out the community with this mini-guide. To save on typing IntelliJ/Webstorm everywhere, I am going to us IW as a short for refering to both.
 
 I will be using Spectre as my test project, because I do not have any of my own personal projects that are Web Apps, I mostly do backend stuff. Plus this also shows that this can handle large complex
 applications.
-
-<!--more-->
 
 Caveats:
 
@@ -35,32 +34,32 @@ Setting up the project is pretty straightforward. If you are starting a new proj
 If you already have a working project, and you just want to switch IDEs, I find this approach the quickest and least error prone. Hit new Project and select "Dart Web Application", and set the Project
 and Module settings to the same root folder (makes life easier later). Make sure the Dart SDK path is right. If you have at any point added a Dart SDK anywhere, it should auto-fill for you.
 
-![Creating the project](/images/2013/Oct/create_project.png#c)
+<img src="/images/${slug}/create_project" alt="Creating a dart web application in Jetbrains IntelliJ/Webstorm" transform-images="avif jxl webp png" />
 
 ### Browser Setup
 
 This is just to make Dart Debuggin easier, but this is global, so you are welcome to set this up to your preference in any other way. In my settings below, I override the default browser with Dartium,
 and also the Chrome location. This will make sure no matter how it wants to open Chrome, it will be Dartium. This setting should be easily found in both IDE versions.
 
-![Setting up the browser](/images/2013/Oct/browser_setup.png#c)
+<img src="/images/${slug}/browser_setup" alt="Configuring web browsers in Jetbrains IntelliJ/WebStorm" transform-images="avif jxl webp png" />
 
 ### Debugging
 
 At this point you should be ready to go. The final step is to debug the app. Find the primary HTML file in you folder structure, right-click it, and hit 'Debug "x.html"'
 
-![Menu entry for debugging](/images/2013/Oct/debug_menu.png#c)
+<img src="/images/${slug}/debug_menu" alt="Menu entry for debugging a dart web app" transform-images="avif jxl webp png" />
 
 It will open up, but it seems like nothing worked right (this happens only the first time). The reason being is that IntelliJ uses its own Plugin to support their debugging and hook into the browser. It will redirect you to the download page, and ask you to install it. You need to install this.
 
-![Getting the extension for JetBrains](/images/2013/Oct/jetbrains_extension.png#c)
+<img src="/images/${slug}/jetbrains_extension" alt="Installing the Jetbrains IDE extension in the browser" transform-images="avif jxl webp png" />
 
 Once this is installed, it will automatically continue where it left off, load the page, and hook in the debugger.
 
-![Setting up the browser](/images/2013/Oct/browser_running.png#c)
+<img src="/images/${slug}/browser_running" alt="Application running in the browser" transform-images="avif jxl webp png" />
 
 And now if we switch back to the IDE we can see the debugger hooked and running.
 
-![Debugger Console](/images/2013/Oct/debug_console.png#c)
+<img src="/images/${slug}/debug_console" alt="Jetbrains IntelliJ/Webstorm debug console" transform-images="avif jxl webp png" />
 
 You can see console output in the console tab. Debugger tab will have all your watches and object views when you hit a breakpoint, and the Scripts tab I assume is for SourceMaps and other stuff for debugging.
 
@@ -84,15 +83,15 @@ But how do you make access this easy? and have the debugger turned on?
 
 Well, we need to make a new custom configuration for the project, and use that. In order to create a custom configuration, there is a dropdown box in the toolbar at the top, right before the Run and Debug buttons. Open the dropdown and hit "Edit Configuration".
 
-![Edit Config Dropedown](/images/2013/Oct/edit_conf_dropdown.png#c)
+<img src="/images/${slug}/edit_conf_dropdown" alt="Edit Configuration dropdown in Jetbrains IntelliJ/WebStorm" transform-images="avif jxl webp png" />
 
 Once in the configuration screen, hit the **+** button at the top left, hover over "JavaScript Debug", and select Remote from the popout list.
 
-![Adding new config](/images/2013/Oct/edit_conf_plus.png#c)
+<img src="/images/${slug}/edit_conf_plus" alt="Selecting a new entry type to add." transform-images="avif jxl webp png" />
 
 Now set it up for Chrome, with the localhost URL I posted above, and adjust it to your project (You can test in a normal browser before-hand). Once its to your liking, you can ignore the mapping, hit apply, ok. And you are set.
 
-![Remote config](/images/2013/Oct/edit_conf_remote.png#c)
+<img src="/images/${slug}/edit_conf_remote" alt="Setting up the remote configuration." transform-images="avif jxl webp png" />
 
 Now here is the difference. You can no longer use the right-click menu to launch, as that always uses the "Local" configuration. You need to select your configuration in the dropdown in the toolbar, and hit the "Debug" button next to it. It should launch, with fulld debugging enabled.
 

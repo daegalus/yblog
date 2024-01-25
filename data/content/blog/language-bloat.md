@@ -4,6 +4,7 @@ date: 2012-09-29T19:00:00Z
 draft: false
 slug: language-bloat
 title: Language Bloat
+cover_alt: A bloated python representing language bloat
 type: blog
 tags:
   - programming
@@ -11,7 +12,7 @@ tags:
   - languages
 ---
 
-![Python](/images/2014/Jul/kaa_the_python_eat_all_animals_by_mcsaurus-d5opepe.jpg#c)
+<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
 *Disclaimer: After reading through this a few times, I realized my train of thought jumps around a lot on this. There is just so much going on in my head on this topic, its hard to not jump around. I apologize for the all over the place article. Hopefully my point is still conveyed.*
 

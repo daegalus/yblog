@@ -10,4 +10,4 @@ tags:
   - science
 ---
 
-**This post has moved to my Disc Golf focused blog. You can find it here:** [https://throwingplastic.com/overmold-vs-single-mold/](https://throwingplastic.com/overmold-vs-single-mold/)
+**This post has moved to my Disc Golf focused blog. You can find it here:** [https://yulian.kuncheff.com/disc-golf/](https://yulian.kuncheff.com/disc-golf/)

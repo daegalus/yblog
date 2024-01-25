@@ -4,6 +4,7 @@ date: 2013-02-21T20:00:00Z
 draft: false
 slug: why-are-there-no-true-cross-platform-filesystems
 title: Why are there no true cross-platform filesystems?
+cover_alt: A table of filesystems
 type: blog
 tags:
   - filesystems
@@ -11,7 +12,7 @@ tags:
   - cross-platform
 ---
 
-![list of file formats](/images/2014/Jul/B800i_FileFormats.jpg#c)
+<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
 As someone that has recently installed multiple operating systems on my desktop, I find a major problem that I think shouldn't really exist, but does.
 

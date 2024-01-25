@@ -5,6 +5,7 @@ description: ""
 draft: false
 slug: "monogame"
 title: "Monogame"
+cover_alt: "Monogame Logo"
 type: "blog"
 tags:
   - gamedev
@@ -13,7 +14,7 @@ tags:
   - engines
 ---
 
-![Monogame Logo](/images/2014/Jul/HorizontalLogo_256px.png#c)
+<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
 *Disclaimer: This is all opinion and personal preference. A lot of the frameworks and game engines I talk about are great, and its my own choices that make them subpar for me. Please take this as an opinion peace, I am not trying to sway anyone in any way, it is just an explanation on why I chose what I did in hopes it might give someone else some ideas.*
 

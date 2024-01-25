@@ -4,6 +4,7 @@ date: 2012-07-07T19:00:00Z
 draft: false
 slug: language-fanboyism
 title: Language Fanboyism
+cover_alt: A small portion of a screen showing some php code.
 type: blog
 tags:
   - programming
@@ -11,7 +12,7 @@ tags:
   - selectivism
 ---
 
-![Languages](/images/2014/Jul/995000_46458615-645x250.jpg#c)
+<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
 This is an opinion and a rant based on my opinion and observations, you have been warned.
 

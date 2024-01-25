@@ -16,13 +16,19 @@ import (
 
 	"yblog/data"
 	"yblog/handlers"
+	"yblog/wasm"
 )
 
 var Version string
 var BuildDate string
 
 func initialize() (*data.Generator, *data.Config) {
-	log.WithFields(log.Fields{"version": Version, "build-date": BuildDate}).Info("yblog")
+	wasm.NewImageProcessing()
+	//if err != nil {
+	//	fmt.Printf("%v\n", err)
+	//}
+	//os.Exit(0)
+	log.WithField("version", Version).WithField("build-date", BuildDate).Info("yblog")
 	memfsInput := afero.NewMemMapFs()
 	memfsOutput := afero.NewMemMapFs()
 
@@ -177,15 +183,14 @@ func main() {
 		LogRoutePath:    true,
 		LogResponseSize: true,
 		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
-			log.WithFields(log.Fields{
-				"method":    values.Method,
-				"client_ip": values.RemoteIP,
-				"latency":   values.Latency.Microseconds(),
-				"time":      values.StartTime,
-				"status":    values.Status,
-				"route":     values.RoutePath,
-				"length":    values.ResponseSize,
-			}).Info(values.URI)
+			log.WithField("method", values.Method).
+				WithField("client_ip", values.RemoteIP).
+				WithField("latency", values.Latency.Microseconds()).
+				WithField("time", values.StartTime).
+				WithField("status", values.Status).
+				WithField("route", values.RoutePath).
+				WithField("length", values.ResponseSize).
+				Info(values.URI)
 
 			return nil
 		},

@@ -31,18 +31,18 @@ func NewGenerator(config *Config, input afero.Fs, output afero.Fs) *Generator {
 func (gen *Generator) generateTemplateHTML(file string, post Post) string {
 	templateString, err := afero.ReadFile(gen.Input, file)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error read template file")
+		log.WithField("error", err).WithField("file", file).Fatal("Error read template file")
 	}
 
 	tmpl, err := template.New(file).Parse(string(templateString))
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error parsing template")
+		log.WithField("error", err).WithField("file", file).Fatal("Error parsing template")
 	}
 
 	var buf strings.Builder
 	err = tmpl.Execute(&buf, post)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err, "file": file}).Fatal("Error executing template")
+		log.WithField("error", err).WithField("file", file).Fatal("Error executing template")
 	}
 	return buf.String()
 }
