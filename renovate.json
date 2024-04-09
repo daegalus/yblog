@@ -8,6 +8,7 @@
   ],
   "packageRules": [
     {
+      "matchBaseBranches": ["main"],
       "groupName": "All"
     }
   ],
