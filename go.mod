@@ -33,7 +33,7 @@ require (
 	github.com/alecthomas/chroma/v2 v2.12.0
 	github.com/caarlos0/log v0.4.4
 	github.com/daegalus/feeds v1.3.3
-	github.com/ebitengine/purego v0.5.2
+	github.com/ebitengine/purego v0.7.1
 	github.com/grokify/html-strip-tags-go v0.1.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/magefile/mage v1.15.0
