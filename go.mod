@@ -42,7 +42,7 @@ require (
 	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/afero v1.11.0
 	github.com/stefanfritsch/goldmark-fences v1.0.0
-	github.com/yuin/goldmark v1.7.1
+	github.com/yuin/goldmark v1.7.4
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	github.com/yuin/goldmark-meta v1.1.0
 )
