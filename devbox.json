@@ -1,0 +1,13 @@
+{
+  "packages": ["go_1_22@latest"],
+  "shell": {
+    "scripts": {
+      "build": [
+        "go build ."
+      ],
+      "start": [
+      	"go run yblog.go"
+      ]
+    }
+  }
+}
