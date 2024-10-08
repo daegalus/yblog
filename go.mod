@@ -1,6 +1,6 @@
 module yblog
 
-go 1.21
+go 1.23
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
@@ -8,6 +8,10 @@ require (
 	github.com/charmbracelet/x/ansi v0.1.3 // indirect
 	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/elliotchance/orderedmap/v2 v2.2.0 // indirect
+	github.com/gen2brain/avif v0.3.2 // indirect
+	github.com/gen2brain/heic v0.3.1 // indirect
+	github.com/gen2brain/jpegxl v0.3.1 // indirect
+	github.com/gen2brain/webp v0.4.5 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
@@ -18,12 +22,14 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/tetratelabs/wazero v1.7.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/image v0.21.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
