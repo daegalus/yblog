@@ -3,6 +3,8 @@ package utils
 import (
 	"bytes"
 	"image"
+	"image/draw"
+	"image/png"
 	"os"
 
 	"github.com/gen2brain/avif"
@@ -21,7 +23,11 @@ func ImageToAVIF(original image.Image) ([]byte, error) {
 		Speed:             4,
 		ChromaSubsampling: image.YCbCrSubsampleRatio420,
 	}
-	err := avif.Encode(buf, original, options)
+
+	b := original.Bounds()
+	m := image.NewNRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+	draw.Draw(m, m.Bounds(), original, b.Min, draw.Src)
+	err := avif.Encode(buf, m, options)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +70,21 @@ func ImageFromWebP(filepath string) (image.Image, error) {
 	}
 
 	imageData, err := webp.Decode(buf)
+	if err != nil {
+		return nil, err
+	}
+
+	return imageData, err
+}
+
+func ImageFromPNG(filepath string) (image.Image, error) {
+	pngImage, err := os.ReadFile(filepath)
+	buf := bytes.NewBuffer(pngImage)
+	if err != nil {
+		return nil, err
+	}
+
+	imageData, err := png.Decode(buf)
 	if err != nil {
 		return nil, err
 	}

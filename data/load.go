@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"yblog/utils"
+	"yblog/utils/goldmark_extensions"
 
 	gmEmbed "github.com/13rac1/goldmark-embed"
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -33,6 +34,7 @@ func (gen *Generator) CompileMarkdown() {
 					chromahtml.WithLineNumbers(true),
 				),
 			),
+			&goldmark_extensions.Picture{},
 			gmEmbed.New(),
 			&fences.Extender{},
 		),
@@ -57,11 +59,16 @@ func (gen *Generator) CompileMarkdown() {
 
 		context := parser.NewContext()
 		var out strings.Builder
+
 		err = md.Convert(data, &out, parser.WithContext(context))
 		if err != nil {
 			log.WithField("error", err).Fatal("Error converting markdown")
 			panic(err)
 		}
+
+		// if strings.Contains(file.Name(), "bloat") {
+		// 	fmt.Println(out.String())
+		// }
 
 		metaData := meta.Get(context)
 

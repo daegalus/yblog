@@ -14,6 +14,8 @@ tags:
 
 <img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
 
+@![test](/images/${slug}/cover.png "test"){"avif,jxl,webps"}
+
 *Disclaimer: After reading through this a few times, I realized my train of thought jumps around a lot on this. There is just so much going on in my head on this topic, its hard to not jump around. I apologize for the all over the place article. Hopefully my point is still conveyed.*
 
 > Update: I just want to clarify that when I refer to JVM/CLR I include their primary language and their standard libraries. The JVM and CLR are robust, generally small, and powerful VMs. The primary bloat gain on them comes from the primary language implementation and the massive libraries that come with it. Java is bloated, with it 100s of libraries and standard libraries were made, which in turn makes them bloated and in turn bloats the whole entire platform. If for example, we took the JVM, rewrote all the libraries in Scala, and used Scala, it would be much much lighter. The problem is Java and the bloat it has introduced into libraries and programs written in it on the JVM. Most languages on the JVM use the Java standard library as a base, so the bloat comes with it.

@@ -16,37 +16,36 @@ import (
 
 	"yblog/data"
 	"yblog/handlers"
-	"yblog/utils"
 )
 
 var Version string
 var BuildDate string
 
 func initialize() (*data.Generator, *data.Config) {
-	imageData, err := utils.ImageFromWebP("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task.webp")
-	if err != nil {
-		log.WithField("err", err).Error("Failed to decode webp")
-	}
-	avifBytes, err := utils.ImageToAVIF(imageData)
-	if err != nil {
-		log.WithField("err", err).Error("Failed to convert to avif")
-	}
-	jxlBytes, err := utils.ImageToJXL(imageData)
-	if err != nil {
-		log.WithField("err", err).Error("Failed to convert to jxl")
-	}
-	webpBytes, err := utils.ImageToWebP(imageData)
-	if err != nil {
-		log.WithField("err", err).Error("Failed to convert to jxl")
-	}
+	// imageData, err := utils.ImageFromPNG("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task.png")
+	// if err != nil {
+	// 	log.WithField("err", err).Error("Failed to decode webp")
+	// }
+	// avifBytes, err := utils.ImageToAVIF(imageData)
+	// if err != nil {
+	// 	log.WithField("err", err).Error("Failed to convert to avif")
+	// }
+	// jxlBytes, err := utils.ImageToJXL(imageData)
+	// if err != nil {
+	// 	log.WithField("err", err).Error("Failed to convert to jxl")
+	// }
+	// webpBytes, err := utils.ImageToWebP(imageData)
+	// if err != nil {
+	// 	log.WithField("err", err).Error("Failed to convert to jxl")
+	// }
 
-	os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.avif", avifBytes, fs.ModePerm)
-	os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.jxl", jxlBytes, fs.ModePerm)
-	os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.webp", webpBytes, fs.ModePerm)
-	//if err != nil {
-	//	fmt.Printf("%v\n", err)
-	//}
-	os.Exit(0)
+	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.avif", avifBytes, fs.ModePerm)
+	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.jxl", jxlBytes, fs.ModePerm)
+	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.webp", webpBytes, fs.ModePerm)
+	// //if err != nil {
+	// //	fmt.Printf("%v\n", err)
+	// //}
+	// os.Exit(0)
 	log.WithField("version", Version).WithField("build-date", BuildDate).Info("yblog")
 	memfsInput := afero.NewMemMapFs()
 	memfsOutput := afero.NewMemMapFs()
@@ -234,5 +233,5 @@ func main() {
 	e.GET("/posts/:post", handlrs.PostHandler)
 	e.GET("/:post", handlrs.PostHandler)
 	e.GET("/tags/:tag", handlrs.TagsHandler)
-	e.Start(":8080")
+	//e.Start(":8080")
 }

@@ -25,10 +25,10 @@ require (
 	github.com/tetratelabs/wazero v1.7.3 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
-	golang.org/x/crypto v0.22.0 // indirect
+	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/image v0.21.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.21.0 // indirect
+	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -42,6 +42,7 @@ require (
 	github.com/caarlos0/log v0.4.6
 	github.com/daegalus/feeds v1.3.3
 	github.com/ebitengine/purego v0.8.0
+	github.com/gabriel-vasile/mimetype v1.4.5
 	github.com/grokify/html-strip-tags-go v0.1.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/magefile/mage v1.15.0
