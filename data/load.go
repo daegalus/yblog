@@ -2,9 +2,11 @@ package data
 
 import (
 	"fmt"
+	"image"
 	"io/fs"
 	"path/filepath"
 	"strings"
+	"sync"
 	"yblog/utils"
 	"yblog/utils/goldmark_extensions"
 
@@ -21,7 +23,92 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 )
 
+func threadEncode(returnChannel chan []byte, imageData image.Image, wg *sync.WaitGroup, encodeFunc func(image.Image) []byte) {
+	defer wg.Done()
+	encodedImage := encodeFunc(imageData)
+	returnChannel <- encodedImage
+}
+
+func encodeFilesInDir(file fs.DirEntry, imagePath string, imageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
+	defer wg.Done()
+	filename := strings.Split(file.Name(), ".")[0]
+	imageData := utils.ImageFromPNG(Content, filepath.Join(imagePath, imageDirEntry.Name(), file.Name()))
+
+	wg.Add(2)
+	avifChan := make(chan []byte)
+	jxlChan := make(chan []byte)
+	webpChan := make(chan []byte)
+
+	go threadEncode(avifChan, imageData, wg, utils.ImageToAVIF)
+	go threadEncode(jxlChan, imageData, wg, utils.ImageToJXL)
+	go threadEncode(webpChan, imageData, wg, utils.ImageToWebP)
+
+	for i := 0; i < 2; i++ {
+		select {
+		case avifBytes := <-avifChan:
+			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif"))).Info("Converting to AVIF")
+			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif")), avifBytes, fs.ModePerm)
+		case jxlBytes := <-jxlChan:
+			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))).Info("Converting to JXL")
+			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl")), jxlBytes, fs.ModePerm)
+		case webpBytes := <-webpChan:
+			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp"))).Info("Converting to WebP")
+			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp")), webpBytes, fs.ModePerm)
+		}
+	}
+}
+
+func encodeFilesInDirSync(file fs.DirEntry, imagePath string, imageDirEntry fs.DirEntry, gen *Generator) {
+	filename := strings.Split(file.Name(), ".")[0]
+	imageData := utils.ImageFromPNG(Content, filepath.Join(imagePath, imageDirEntry.Name(), file.Name()))
+
+	avifData := utils.ImageToAVIF(imageData)
+	jxlData := utils.ImageToJXL(imageData)
+	webpData := utils.ImageToWebP(imageData)
+
+	log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif"))).Info("Converting to AVIF")
+	afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif")), avifData, fs.ModePerm)
+
+	log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))).Info("Converting to JXL")
+	afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl")), jxlData, fs.ModePerm)
+
+	log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp"))).Info("Converting to WebP")
+	afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp")), webpData, fs.ModePerm)
+}
+
+func encodeAllDirs(imagePath string, imageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
+	defer wg.Done()
+	log.WithField("dir", imageDirEntry.Name()).Info("Converting in Post")
+	if imageDirEntry.IsDir() {
+		postImageDir, _ := fs.ReadDir(Content, filepath.Join(imagePath, imageDirEntry.Name()))
+		wg.Add(len(postImageDir))
+		for _, file := range postImageDir {
+			go encodeFilesInDir(file, imagePath, imageDirEntry, gen, wg)
+		}
+	}
+}
+
+func encodeAllDirsSync(imagePath string, imageDirEntry fs.DirEntry, gen *Generator) {
+	log.WithField("dir", imageDirEntry.Name()).Info("Converting in Post")
+	if imageDirEntry.IsDir() {
+		postImageDir, _ := fs.ReadDir(Content, filepath.Join(imagePath, imageDirEntry.Name()))
+		for _, file := range postImageDir {
+			encodeFilesInDirSync(file, imagePath, imageDirEntry, gen)
+		}
+	}
+}
+
 func (gen *Generator) CompileMarkdown() {
+	log.Info("Converting Images")
+	imagePath := "content/images"
+	imageDirEntries, _ := fs.ReadDir(Content, imagePath)
+	//var wg sync.WaitGroup
+	//wg.Add(len(imageDirEntries))
+	for _, imageDirEntry := range imageDirEntries {
+		//go encodeAllDirs(imagePath, imageDirEntry, gen, &wg)
+		encodeAllDirsSync(imagePath, imageDirEntry, gen)
+	}
+
 	log.Info("Compiling markdown")
 	md := goldmark.New(
 		goldmark.WithExtensions(

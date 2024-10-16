@@ -60,6 +60,16 @@ func (gen *Generator) generatePost(post Post) string {
 		Footer: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), post),
 	}
 
+	// if strings.Contains(post.FrontMatter.Slug, "bloat") {
+	// 	log.WithField("post", post.HTML).Info("Generated post")
+	// }
+
+	uttmpl, _ := template.New("utPage").Parse(post.HTML)
+	var templatedOut strings.Builder
+	err = uttmpl.Execute(&templatedOut, page)
+
+	post.HTML = templatedOut.String()
+
 	tmpl, err := template.New("page").Parse(string(postHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing post template")

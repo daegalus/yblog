@@ -2,11 +2,13 @@ package utils
 
 import (
 	"bytes"
+	"embed"
 	"image"
 	"image/draw"
 	"image/png"
-	"os"
+	"sync"
 
+	"github.com/caarlos0/log"
 	"github.com/gen2brain/avif"
 	"github.com/gen2brain/jpegxl"
 	"github.com/gen2brain/webp"
@@ -14,7 +16,7 @@ import (
 
 //TODO: AVIF/JXL have washed out colors from WEBP. Might be from the YcBcr to RGBA conversion that is happening.
 
-func ImageToAVIF(original image.Image) ([]byte, error) {
+func ImageToAVIF(original image.Image) []byte {
 	encodedImage := []byte{}
 	buf := bytes.NewBuffer(encodedImage)
 	options := avif.Options{
@@ -28,13 +30,38 @@ func ImageToAVIF(original image.Image) ([]byte, error) {
 	m := image.NewNRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
 	draw.Draw(m, m.Bounds(), original, b.Min, draw.Src)
 	err := avif.Encode(buf, m, options)
+
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to encode AVIF")
+		return nil
 	}
-	return buf.Bytes(), nil
+	return buf.Bytes()
 }
 
-func ImageToJXL(original image.Image) ([]byte, error) {
+func ImageToAVIFThread(original image.Image, wg *sync.WaitGroup, returnChan chan []byte) {
+	defer wg.Done()
+	encodedImage := []byte{}
+	buf := bytes.NewBuffer(encodedImage)
+	options := avif.Options{
+		Quality:           50,
+		QualityAlpha:      50,
+		Speed:             4,
+		ChromaSubsampling: image.YCbCrSubsampleRatio420,
+	}
+
+	b := original.Bounds()
+	m := image.NewNRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+	draw.Draw(m, m.Bounds(), original, b.Min, draw.Src)
+	err := avif.Encode(buf, m, options)
+
+	if err != nil {
+		log.WithError(err).Error("Failed to encode AVIF")
+	}
+
+	returnChan <- buf.Bytes()
+}
+
+func ImageToJXL(original image.Image) []byte {
 	encodedImage := []byte{}
 	buf := bytes.NewBuffer(encodedImage)
 	options := jpegxl.Options{
@@ -43,12 +70,13 @@ func ImageToJXL(original image.Image) ([]byte, error) {
 	}
 	err := jpegxl.Encode(buf, original, options)
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to encode JXL")
+		return nil
 	}
-	return buf.Bytes(), nil
+	return buf.Bytes()
 }
 
-func ImageToWebP(original image.Image) ([]byte, error) {
+func ImageToWebP(original image.Image) []byte {
 	encodedImage := []byte{}
 	buf := bytes.NewBuffer(encodedImage)
 	options := webp.Options{
@@ -57,37 +85,55 @@ func ImageToWebP(original image.Image) ([]byte, error) {
 	}
 	err := webp.Encode(buf, original, options)
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to encode WebP")
+		return nil
 	}
-	return buf.Bytes(), nil
+	return buf.Bytes()
 }
 
-func ImageFromWebP(filepath string) (image.Image, error) {
-	webpImage, err := os.ReadFile(filepath)
-	buf := bytes.NewBuffer(webpImage)
-	if err != nil {
-		return nil, err
+func ImageToWebPThreaded(original image.Image, wg *sync.WaitGroup, returnChan chan []byte) {
+	defer wg.Done()
+	encodedImage := []byte{}
+	buf := bytes.NewBuffer(encodedImage)
+	options := webp.Options{
+		Quality: 75,
+		Method:  6,
 	}
-
-	imageData, err := webp.Decode(buf)
+	err := webp.Encode(buf, original, options)
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to encode WebP")
 	}
-
-	return imageData, err
+	returnChan <- buf.Bytes()
 }
 
-func ImageFromPNG(filepath string) (image.Image, error) {
-	pngImage, err := os.ReadFile(filepath)
-	buf := bytes.NewBuffer(pngImage)
+func ImageFromWebP(fs embed.FS, filepath string) image.Image {
+	webpImage, err := fs.ReadFile(filepath)
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to read WebP file")
+		return nil
 	}
 
-	imageData, err := png.Decode(buf)
+	imageData, err := webp.Decode(bytes.NewBuffer(webpImage))
 	if err != nil {
-		return nil, err
+		log.WithError(err).Error("Failed to decode WebP")
+		return nil
 	}
 
-	return imageData, err
+	return imageData
+}
+
+func ImageFromPNG(fs embed.FS, filepath string) image.Image {
+	pngImage, err := fs.ReadFile(filepath)
+	if err != nil {
+		log.WithError(err).Error("Failed to read PNG file")
+		return nil
+	}
+
+	imageData, err := png.Decode(bytes.NewBuffer(pngImage))
+	if err != nil {
+		log.WithError(err).Error("Failed to decode PNG")
+		return nil
+	}
+
+	return imageData
 }

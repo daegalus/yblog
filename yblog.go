@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/alecthomas/kong"
 	"github.com/caarlos0/log"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -22,30 +23,6 @@ var Version string
 var BuildDate string
 
 func initialize() (*data.Generator, *data.Config) {
-	// imageData, err := utils.ImageFromPNG("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task.png")
-	// if err != nil {
-	// 	log.WithField("err", err).Error("Failed to decode webp")
-	// }
-	// avifBytes, err := utils.ImageToAVIF(imageData)
-	// if err != nil {
-	// 	log.WithField("err", err).Error("Failed to convert to avif")
-	// }
-	// jxlBytes, err := utils.ImageToJXL(imageData)
-	// if err != nil {
-	// 	log.WithField("err", err).Error("Failed to convert to jxl")
-	// }
-	// webpBytes, err := utils.ImageToWebP(imageData)
-	// if err != nil {
-	// 	log.WithField("err", err).Error("Failed to convert to jxl")
-	// }
-
-	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.avif", avifBytes, fs.ModePerm)
-	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.jxl", jxlBytes, fs.ModePerm)
-	// os.WriteFile("data/content/images/running-cs-go-on-a-distributed-blockchain-compute-network/csgo-lanonly-somn-task-new.webp", webpBytes, fs.ModePerm)
-	// //if err != nil {
-	// //	fmt.Printf("%v\n", err)
-	// //}
-	// os.Exit(0)
 	log.WithField("version", Version).WithField("build-date", BuildDate).Info("yblog")
 	memfsInput := afero.NewMemMapFs()
 	memfsOutput := afero.NewMemMapFs()
@@ -56,45 +33,6 @@ func initialize() (*data.Generator, *data.Config) {
 	log.WithField("config", config).Info("Config loaded")
 
 	generator := data.NewGenerator(&config, memfsInput, memfsOutput)
-
-	w := watcher.New()
-	w.SetMaxEvents(1)
-	w.FilterOps(watcher.Write, watcher.Create, watcher.Remove, watcher.Rename)
-
-	go func() {
-		for {
-			select {
-			case event := <-w.Event:
-				fmt.Println(event) // Print the event's info.
-				config = loadConfig()
-				reloadFilesFromFS(memfsInput)
-				generator = data.NewGenerator(&config, memfsInput, memfsOutput)
-				generator.CompileMarkdown()
-			case err := <-w.Error:
-				log.WithError(err).Fatal("Error watching files")
-			case <-w.Closed:
-				return
-			}
-		}
-	}()
-
-	if err := w.AddRecursive("./data/content"); err != nil {
-		log.WithError(err).Fatal("Error watching contents folder")
-	}
-
-	if err := w.AddRecursive("./data/themes"); err != nil {
-		log.WithError(err).Fatal("Error watching contents folder")
-	}
-
-	if err := w.Add("./yblog.toml"); err != nil {
-		log.WithError(err).Fatal("Error watching contents folder")
-	}
-
-	// if err := w.Start(time.Second * 1); err != nil {
-	// 	log.WithError(err).Fatal("Error starting watcher")
-	// }
-
-	go w.Start(time.Second * 1)
 
 	return generator, &config
 }
@@ -154,40 +92,54 @@ func reloadFilesFromFS(input afero.Fs) {
 	}
 }
 
-func main() {
+func startServeWatcher(config data.Config, generator *data.Generator, memfsInput afero.Fs, memfsOutput afero.Fs) {
+	w := watcher.New()
+	w.SetMaxEvents(1)
+	w.FilterOps(watcher.Write, watcher.Create, watcher.Remove, watcher.Rename)
+
+	go func() {
+		for {
+			select {
+			case event := <-w.Event:
+				fmt.Println(event) // Print the event's info.
+				config = loadConfig()
+				reloadFilesFromFS(memfsInput)
+				generator = data.NewGenerator(&config, memfsInput, memfsOutput)
+				generator.CompileMarkdown()
+			case err := <-w.Error:
+				log.WithError(err).Fatal("Error watching files")
+			case <-w.Closed:
+				return
+			}
+		}
+	}()
+
+	if err := w.AddRecursive("./data/content"); err != nil {
+		log.WithError(err).Fatal("Error watching contents folder")
+	}
+
+	if err := w.AddRecursive("./data/themes"); err != nil {
+		log.WithError(err).Fatal("Error watching contents folder")
+	}
+
+	if err := w.Add("./yblog.toml"); err != nil {
+		log.WithError(err).Fatal("Error watching contents folder")
+	}
+
+	// if err := w.Start(time.Second * 1); err != nil {
+	// 	log.WithError(err).Fatal("Error starting watcher")
+	// }
+
+	go w.Start(time.Second * 1)
+}
+
+type Serve struct{}
+
+func (s *Serve) Run(ctx *Context) error {
 	generator, config := initialize()
 	generator.CompileMarkdown()
 
-	// file, _ := afero.ReadFile(generator.Output, "/feed.atom")
-	// fmt.Println(string(file))
-
-	// fmt.Println("Input:")
-	// afero.Walk(generator.Input, ".", func(path string, info fs.FileInfo, err error) error {
-	// 	if err != nil {
-	// 		log.WithError(err).Fatal("Error reading files")
-	// 	}
-	// 	if info.IsDir() {
-	// 		return nil
-	// 	}
-
-	// 	fmt.Println(path)
-	// 	return nil
-	// })
-
-	// fmt.Println("Output:")
-	// afero.Walk(generator.Output, ".", func(path string, info fs.FileInfo, err error) error {
-	// 	if err != nil {
-	// 		log.WithError(err).Fatal("Error reading files")
-	// 	}
-	// 	if info.IsDir() {
-	// 		return nil
-	// 	}
-
-	// 	fmt.Println(path)
-	// 	return nil
-	// })
-
-	// os.Exit(0)
+	startServeWatcher(*config, generator, generator.Input, generator.Output)
 
 	e := echo.New()
 
@@ -233,5 +185,65 @@ func main() {
 	e.GET("/posts/:post", handlrs.PostHandler)
 	e.GET("/:post", handlrs.PostHandler)
 	e.GET("/tags/:tag", handlrs.TagsHandler)
-	//e.Start(":8080")
+	e.Start(":8080")
+
+	return nil
+}
+
+type Deploy struct {
+	Watch      bool   `help:"Watch for changes, and rebuild"`
+	OutputPath string `help:"Output path of generated site" default:"./public"`
+}
+
+func (d *Deploy) Run(ctx *Context) error {
+	generator, _ := initialize()
+	generator.CompileMarkdown()
+
+	osfs := afero.NewOsFs()
+	afero.Walk(generator.Output, ".", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.WithError(err).Fatal("Error reading files")
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		} else {
+			osfs.MkdirAll(filepath.Join(d.OutputPath, filepath.Dir(path)), 0755)
+		}
+
+		in, err := generator.Output.OpenFile(path, os.O_RDONLY, 0644)
+		if err != nil {
+			log.WithError(err).Fatal("Error reading files")
+			return err
+		}
+		content := make([]byte, info.Size())
+		in.Read(content)
+
+		oFile, err := osfs.Create(filepath.Join(d.OutputPath, path))
+		if err != nil {
+			log.WithError(err).Fatal("Error writing files")
+			return err
+		}
+		oFile.Write(content)
+
+		return nil
+	})
+	return nil
+}
+
+type Context struct {
+	Debug bool
+}
+
+var cli struct {
+	Debug bool `help:"Enable debug mode"`
+
+	Serve  Serve  `cmd help:"Serve the generated files"`
+	Deploy Deploy `cmd help:"Deploy the generated files"`
+}
+
+func main() {
+	ctx := kong.Parse(&cli)
+	err := ctx.Run(&Context{Debug: cli.Debug})
+	ctx.FatalIfErrorf(err)
 }

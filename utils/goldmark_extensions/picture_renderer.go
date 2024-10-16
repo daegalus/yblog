@@ -1,15 +1,9 @@
 package goldmark_extensions
 
 import (
-	"bytes"
-	"encoding/base64"
 	"fmt"
-	"io"
-	"os"
-	"path/filepath"
 	"strings"
 
-	"github.com/gabriel-vasile/mimetype"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/parser"
@@ -100,71 +94,36 @@ var commonWebImages = func() map[string]struct{} {
 	return m
 }()
 
-func (r *PictureRenderer) encodeImage(src []byte) ([]byte, error) {
-	s := string(src)
-	// do not encode online image
-	if strings.HasPrefix(s, "http://") || strings.HasPrefix(s, "https://") {
-		return src, nil
-	}
-	// already encoded
-	if strings.HasPrefix(s, "data:") {
-		return src, nil
-	}
-	if !filepath.IsAbs(s) && r.ParentPath != "" {
-		s = filepath.Join(r.ParentPath, s)
-	}
-	f, err := os.Open(filepath.Clean(s))
-	if err != nil {
-		return nil, fmt.Errorf("fail to open %s: %w", s, err)
-	}
-	defer f.Close()
-	b, err := io.ReadAll(f)
-	if err != nil {
-		return nil, fmt.Errorf("fail to read %s: %w", s, err)
-	}
-	mtype := mimetype.Detect(b).String()
-	if _, exist := commonWebImages[mtype]; !exist {
-		return nil, fmt.Errorf("can not embed the filetype %s", mtype)
-	}
-
-	var buf bytes.Buffer
-	buf.Write([]byte(fmt.Sprintf("data:%s;base64,", mtype)))
-	enc := base64.NewEncoder(base64.StdEncoding, &buf)
-	enc.Write(b)
-	enc.Close()
-
-	return buf.Bytes(), nil
-}
-
 // renderImage adds image embedding function to github.com/yuin/goldmark/renderer/html (MIT).
 func (r *PictureRenderer) renderImage(w util.BufWriter, source []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkContinue, nil
 	}
 	n := node.(*PictureSet)
-	fmt.Printf("attributes %v\n", n.Attributes())
-	fmt.Printf("ChildCount %v\n", n.ChildCount())
-	fmt.Printf("node %+v\n", n)
-	_, _ = w.WriteString(`<picture>`)
+	_, _ = w.WriteString("<picture>")
 
-	_, _ = w.WriteString(` <source srcset="`)
-	if r.XHTML {
-		_, _ = w.WriteString(" />")
-	} else {
-		_, _ = w.WriteString(">")
+	urlSplit := strings.Split(string(n.Destination), ".")
+	url := strings.Join(urlSplit[:len(urlSplit)-1], ".")
+
+	for _, source := range n.Sources {
+		_, _ = w.WriteString(` <source srcset="`)
+		if r.Unsafe || !html.IsDangerousURL([]byte(fmt.Sprintf("%s.%s", url, source))) {
+			_, _ = w.Write([]byte(fmt.Sprintf("%s.%s", url, source)))
+		}
+		_ = w.WriteByte('"')
+		if r.XHTML {
+			_, _ = w.WriteString(" />")
+		} else {
+			_, _ = w.WriteString(">")
+		}
 	}
 	_, _ = w.WriteString(` <img src="`)
 	if r.Unsafe || !html.IsDangerousURL(n.Destination) {
-		s, err := r.encodeImage(n.Destination)
-		s = []byte{}
-		if err != nil || s == nil {
-			_, _ = w.Write(util.EscapeHTML(util.URLEscape(n.Destination, true)))
-		} else {
-			_, _ = w.Write(s)
-		}
+		_, _ = w.Write(n.Destination)
 	}
 	_, _ = w.WriteString(`" alt="`)
-	_, _ = w.Write(nodeToHTMLText(n, source))
+	altAttr, _ := n.AttributeString("alt")
+	_, _ = w.WriteString(string(altAttr.([]byte)))
 	_ = w.WriteByte('"')
 	if n.Title != nil {
 		_, _ = w.WriteString(` title="`)
@@ -180,20 +139,6 @@ func (r *PictureRenderer) renderImage(w util.BufWriter, source []byte, node ast.
 		_, _ = w.WriteString(">")
 	}
 	return ast.WalkSkipChildren, nil
-}
-
-func nodeToHTMLText(n ast.Node, source []byte) []byte {
-	var buf bytes.Buffer
-	for c := n.FirstChild(); c != nil; c = c.NextSibling() {
-		if s, ok := c.(*ast.String); ok && s.IsCode() {
-			buf.Write(s.Text(source))
-		} else if !c.HasChildren() {
-			buf.Write(util.EscapeHTML(c.Text(source)))
-		} else {
-			buf.Write(nodeToHTMLText(c, source))
-		}
-	}
-	return buf.Bytes()
 }
 
 // Picture implements goldmark.Extender

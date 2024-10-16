@@ -1,7 +1,6 @@
 package goldmark_extensions
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/yuin/goldmark/ast"
@@ -26,30 +25,65 @@ func (s *pictureSetParser) Trigger() []byte {
 var linkBottom = parser.NewContextKey()
 
 func (s *pictureSetParser) Parse(parent ast.Node, block text.Reader, pc parser.Context) ast.Node {
-	line, _ := block.PeekLine()
-	fmt.Printf("line: %s\n", string(line))
 	block.Advance(1) // skip @
-	fmt.Println(string(block.Peek()))
-
-	linkParser := parser.NewLinkParser()
-	linkNode := linkParser.Parse(parent, block, pc)
-	linkNode2 := linkParser.Parse(parent, block, pc)
-
-	fmt.Println(linkNode2)
-
-	fmt.Printf("block: %s", string(block.Peek()))
-
-	fmt.Printf("title: %s, destination: %s, block: %s", linkNode.(*ast.Image).Title, linkNode.(*ast.Image).Destination, string(block.Source()))
-
-	if block.Peek() == '{' {
-		link := s.parseSources(linkNode, block, pc)
-		return NewPictureSet(linkNode.(*ast.Image), link)
-	} else {
-		return linkNode
+	if block.Peek() != '!' {
+		return nil
 	}
+	block.Advance(1) // skip !
+	if block.Peek() != '[' {
+		return nil
+	}
+	block.Advance(1) // skip [
+	var altText []byte
+	for block.Peek() != ']' {
+		altText = append(altText, block.Peek())
+		block.Advance(1)
+	}
+	block.Advance(1) // skip ]
+	if block.Peek() != '(' {
+		return nil
+	}
+	block.Advance(1) // skip (
+	var destination []byte
+	for block.Peek() != '"' && block.Peek() != ')' {
+		if block.Peek() == '\\' {
+			block.Advance(1)
+		}
+		destination = append(destination, block.Peek())
+		block.Advance(1)
+	}
+	var title []byte
+	if block.Peek() == '"' {
+		destination = destination[:len(destination)-1]
+		block.Advance(1)
+		for block.Peek() != '"' {
+			title = append(title, block.Peek())
+			block.Advance(1)
+		}
+		block.Advance(1)
+	}
+	block.Advance(1) // skip )
+	if block.Peek() != '{' {
+		return nil
+	}
+
+	sources := s.parseSources(block)
+	if sources == nil {
+		return nil
+	}
+
+	linkNode := ast.NewLink()
+	linkNode.Destination = destination
+	linkNode.Title = title
+
+	imageNode := ast.NewImage(linkNode)
+	imageNode.SetAttribute([]byte("alt"), altText)
+
+	pictureNode := NewPictureSet(imageNode, sources)
+	return pictureNode
 }
 
-func (s *pictureSetParser) parseSources(parent ast.Node, block text.Reader, pc parser.Context) *[]string {
+func (s *pictureSetParser) parseSources(block text.Reader) *[]string {
 	block.Advance(1) // skip '{'
 	block.SkipSpaces()
 	var sources []byte
