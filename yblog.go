@@ -17,6 +17,7 @@ import (
 
 	"yblog/data"
 	"yblog/handlers"
+	"yblog/utils"
 )
 
 var Version string
@@ -24,15 +25,21 @@ var BuildDate string
 
 func initialize() (*data.Generator, *data.Config) {
 	log.WithField("version", Version).WithField("build-date", BuildDate).Info("yblog")
-	memfsInput := afero.NewMemMapFs()
-	memfsOutput := afero.NewMemMapFs()
-
-	copyContentFiles(memfsInput)
 
 	config := loadConfig()
+
+	memfsInput := afero.NewMemMapFs()
+	memfsOutput := afero.NewMemMapFs()
+	memfsCache := afero.NewMemMapFs()
+
+	copyFiles(afero.FromIOFS{FS: data.Content}, memfsInput, ".")
+	if _, err := os.Stat(config.Site.Output); err == nil {
+		copyFiles(afero.NewOsFs(), memfsCache, config.Site.Output)
+	}
+
 	log.WithField("config", config).Info("Config loaded")
 
-	generator := data.NewGenerator(&config, memfsInput, memfsOutput)
+	generator := data.NewGenerator(&config, memfsInput, memfsOutput, memfsCache)
 
 	return generator, &config
 }
@@ -43,11 +50,19 @@ func loadConfig() data.Config {
 	if err != nil {
 		log.WithError(err).Fatal("Error reading config file")
 	}
+
+	if config.Site.Theme == "" {
+		config.Site.Theme = "simple"
+	}
+
+	if config.Site.Output == "" {
+		config.Site.Output = "./public"
+	}
 	return config
 }
 
-func copyContentFiles(input afero.Fs) {
-	err := fs.WalkDir(data.Content, ".", func(path string, info os.DirEntry, err error) error {
+func copyFiles(input afero.Fs, output afero.Fs, rootPath string) {
+	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			log.WithError(err).Fatal("Error reading files")
 		}
@@ -56,11 +71,12 @@ func copyContentFiles(input afero.Fs) {
 		}
 
 		input.MkdirAll(filepath.Dir(path), 0755)
-		in, err := data.Content.ReadFile(path)
+
+		in, err := afero.ReadFile(input, path)
 		if err != nil {
 			log.WithError(err).Fatal("Error reading files")
 		}
-		afero.WriteFile(input, path, in, 0644)
+		afero.WriteFile(output, path, in, 0644)
 
 		return nil
 	})
@@ -69,30 +85,7 @@ func copyContentFiles(input afero.Fs) {
 	}
 }
 
-func reloadFilesFromFS(input afero.Fs) {
-	err := filepath.WalkDir("./data", func(path string, info os.DirEntry, err error) error {
-		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
-		}
-		if info.IsDir() {
-			return nil
-		}
-
-		input.MkdirAll(filepath.Dir(path), 0755)
-		in, err := os.ReadFile(path)
-		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
-		}
-		afero.WriteFile(input, path, in, 0644)
-
-		return nil
-	})
-	if err != nil {
-		log.WithError(err).Fatal("Error reading files")
-	}
-}
-
-func startServeWatcher(config data.Config, generator *data.Generator, memfsInput afero.Fs, memfsOutput afero.Fs) {
+func startServeWatcher(config data.Config, generator *data.Generator, memfsInput afero.Fs, memfsOutput afero.Fs, memfsCache afero.Fs) {
 	w := watcher.New()
 	w.SetMaxEvents(1)
 	w.FilterOps(watcher.Write, watcher.Create, watcher.Remove, watcher.Rename)
@@ -102,10 +95,11 @@ func startServeWatcher(config data.Config, generator *data.Generator, memfsInput
 			select {
 			case event := <-w.Event:
 				fmt.Println(event) // Print the event's info.
-				config = loadConfig()
-				reloadFilesFromFS(memfsInput)
-				generator = data.NewGenerator(&config, memfsInput, memfsOutput)
-				generator.CompileMarkdown()
+				genNew, _ := initialize()
+				genNew.CompileMarkdown()
+				generator.Input = genNew.Input
+				generator.Output = genNew.Output
+				generator.Cache = genNew.Cache
 			case err := <-w.Error:
 				log.WithError(err).Fatal("Error watching files")
 			case <-w.Closed:
@@ -139,7 +133,9 @@ func (s *Serve) Run(ctx *Context) error {
 	generator, config := initialize()
 	generator.CompileMarkdown()
 
-	startServeWatcher(*config, generator, generator.Input, generator.Output)
+	utils.CopyFiles(generator.Output, generator.Cache, ".", "", "./public")
+
+	startServeWatcher(*config, generator, generator.Input, generator.Output, generator.Cache)
 
 	e := echo.New()
 
@@ -170,7 +166,7 @@ func (s *Serve) Run(ctx *Context) error {
 	e.Use(middleware.Gzip())
 	e.HideBanner = true
 
-	imageFS := echo.MustSubFS(afero.NewIOFS(generator.Input), "content/images")
+	imageFS := echo.MustSubFS(afero.NewIOFS(generator.Output), "images")
 	handlrs := handlers.NewHandlers(config, generator.Output)
 
 	e.GET("", handlrs.IndexHandler)
@@ -198,6 +194,8 @@ type Deploy struct {
 func (d *Deploy) Run(ctx *Context) error {
 	generator, _ := initialize()
 	generator.CompileMarkdown()
+
+	utils.CopyFiles(generator.Output, generator.Cache, ".", "", d.OutputPath)
 
 	osfs := afero.NewOsFs()
 	afero.Walk(generator.Output, ".", func(path string, info os.FileInfo, err error) error {
@@ -238,8 +236,8 @@ type Context struct {
 var cli struct {
 	Debug bool `help:"Enable debug mode"`
 
-	Serve  Serve  `cmd help:"Serve the generated files"`
-	Deploy Deploy `cmd help:"Deploy the generated files"`
+	Serve  Serve  `cmd:"" help:"Serve the generated files"`
+	Deploy Deploy `cmd:"" help:"Deploy the generated files"`
 }
 
 func main() {

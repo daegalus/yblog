@@ -18,13 +18,15 @@ type Generator struct {
 	config *Config
 	Input  afero.Fs
 	Output afero.Fs
+	Cache  afero.Fs
 }
 
-func NewGenerator(config *Config, input afero.Fs, output afero.Fs) *Generator {
+func NewGenerator(config *Config, input afero.Fs, output afero.Fs, cache afero.Fs) *Generator {
 	return &Generator{
 		config: config,
 		Input:  input,
 		Output: output,
+		Cache:  cache,
 	}
 }
 
@@ -176,13 +178,13 @@ func (gen *Generator) generateFeeds() (string, string, string) {
 		log.WithField("error", err).Fatal("Error generating rss feed")
 	}
 
-	// jsonObj := &feeds.JSON{feed}
-	// jsonFeedObj := jsonObj.JSONFeed()
-	// jsonFeedObj.Extensions = append(jsonFeedObj.Extensions, &feeds.JSONExtensions{
-	// 	Key:   "Generator",
-	// 	Value: "yblog",
-	// })
-	json, err := feed.ToJSON()
+	jsonObj := &feeds.JSON{Feed: feed}
+	jsonFeedObj := jsonObj.JSONFeed()
+	jsonFeedObj.Extensions = append(jsonFeedObj.Extensions, &feeds.JSONExtensions{
+		Key:   "Generator",
+		Value: "yblog",
+	})
+	json, err := jsonObj.ToJSON()
 	if err != nil {
 		log.WithField("error", err).Fatal("Error generating json feed")
 	}

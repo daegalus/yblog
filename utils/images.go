@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bytes"
-	"embed"
 	"image"
 	"image/draw"
 	"image/png"
@@ -12,6 +11,7 @@ import (
 	"github.com/gen2brain/avif"
 	"github.com/gen2brain/jpegxl"
 	"github.com/gen2brain/webp"
+	"github.com/spf13/afero"
 )
 
 //TODO: AVIF/JXL have washed out colors from WEBP. Might be from the YcBcr to RGBA conversion that is happening.
@@ -106,8 +106,8 @@ func ImageToWebPThreaded(original image.Image, wg *sync.WaitGroup, returnChan ch
 	returnChan <- buf.Bytes()
 }
 
-func ImageFromWebP(fs embed.FS, filepath string) image.Image {
-	webpImage, err := fs.ReadFile(filepath)
+func ImageFromWebP(fs afero.Fs, filepath string) image.Image {
+	webpImage, err := afero.ReadFile(fs, filepath)
 	if err != nil {
 		log.WithError(err).Error("Failed to read WebP file")
 		return nil
@@ -122,8 +122,8 @@ func ImageFromWebP(fs embed.FS, filepath string) image.Image {
 	return imageData
 }
 
-func ImageFromPNG(fs embed.FS, filepath string) image.Image {
-	pngImage, err := fs.ReadFile(filepath)
+func ImageFromPNG(fs afero.Fs, filepath string) image.Image {
+	pngImage, err := afero.ReadFile(fs, filepath)
 	if err != nil {
 		log.WithError(err).Error("Failed to read PNG file")
 		return nil

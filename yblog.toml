@@ -1,2 +1,3 @@
 [site]
 theme="simple"
+output="./public"
