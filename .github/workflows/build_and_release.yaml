@@ -1,0 +1,43 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Earthdate
+        id: download-earthdate
+        run: wget -O earthdate https://github.com/daegalus/earthdate/releases/latest/download/earthdate-linux-x86_64
+
+      - name: Fix Permissions
+        run: chmod +x earthdate
+
+      - name: Get earthdate
+        id: earthdate
+        run: echo "earthdate=$(./earthdate)" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      
+      - name: "Build"
+        run: go run yblog.go deploy
+
+      - name: "Compress"
+        run: tar -cJf website.tar.zst public/*
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.earthdate.outputs.earthdate }}
+          tag_name: ${{ steps.earthdate.outputs.earthdate }}
+          files: |
+            website.tar.zst
+
