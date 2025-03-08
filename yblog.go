@@ -64,7 +64,7 @@ func loadConfig() data.Config {
 func copyFiles(input afero.Fs, output afero.Fs, rootPath string) {
 	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error reading files during walk")
 		}
 		if info.IsDir() {
 			return nil
@@ -74,14 +74,14 @@ func copyFiles(input afero.Fs, output afero.Fs, rootPath string) {
 
 		in, err := afero.ReadFile(input, path)
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error reading file during walk")
 		}
 		afero.WriteFile(output, path, in, 0644)
 
 		return nil
 	})
 	if err != nil {
-		log.WithError(err).Fatal("Error reading files")
+		log.WithError(err).Fatal("Error walking files")
 	}
 }
 
@@ -200,7 +200,7 @@ func (d *Deploy) Run(ctx *Context) error {
 	osfs := afero.NewOsFs()
 	afero.Walk(generator.Output, ".", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error reading files during deploy walk")
 			return err
 		}
 		if info.IsDir() {
@@ -211,7 +211,7 @@ func (d *Deploy) Run(ctx *Context) error {
 
 		in, err := generator.Output.OpenFile(path, os.O_RDONLY, 0644)
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error opening file for output")
 			return err
 		}
 		content := make([]byte, info.Size())
@@ -219,7 +219,7 @@ func (d *Deploy) Run(ctx *Context) error {
 
 		oFile, err := osfs.Create(filepath.Join(d.OutputPath, path))
 		if err != nil {
-			log.WithError(err).Fatal("Error writing files")
+			log.WithError(err).Fatal("Error creating files for output")
 			return err
 		}
 		oFile.Write(content)

@@ -12,7 +12,7 @@ tags:
   - cross-platform
 ---
 
-<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
+@![A table of filesystems](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "A table of filesystems"){"avif,jxl,webp"}
 
 As someone that has recently installed multiple operating systems on my desktop, I find a major problem that I think shouldn't really exist, but does.
 

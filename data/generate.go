@@ -30,8 +30,8 @@ func NewGenerator(config *Config, input afero.Fs, output afero.Fs, cache afero.F
 	}
 }
 
-func (gen *Generator) generateTemplateHTML(file string, post Post) string {
-	templateString, err := afero.ReadFile(gen.Input, file)
+func generateTemplateHTML[T Post | KB](fs afero.Fs, file string, in T) string {
+	templateString, err := afero.ReadFile(fs, file)
 	if err != nil {
 		log.WithField("error", err).WithField("file", file).Fatal("Error read template file")
 	}
@@ -42,7 +42,7 @@ func (gen *Generator) generateTemplateHTML(file string, post Post) string {
 	}
 
 	var buf strings.Builder
-	err = tmpl.Execute(&buf, post)
+	err = tmpl.Execute(&buf, in)
 	if err != nil {
 		log.WithField("error", err).WithField("file", file).Fatal("Error executing template")
 	}
@@ -56,10 +56,10 @@ func (gen *Generator) generatePost(post Post) string {
 	}
 
 	page := Page{
-		Header: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), post),
-		Nav:    gen.generateTemplateHTML(fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), post),
+		Header: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), post),
+		Nav:    generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), post),
 		Posts:  []*Post{&post},
-		Footer: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), post),
+		Footer: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), post),
 	}
 
 	// if strings.Contains(post.FrontMatter.Slug, "bloat") {
@@ -101,10 +101,10 @@ func (gen *Generator) generateIndex() string {
 	})
 
 	index := Page{
-		Header: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:    gen.generateTemplateHTML(fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
+		Header: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
+		Nav:    generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
 		Posts:  local_posts,
-		Footer: gen.generateTemplateHTML(fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
+		Footer: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
 	}
 
 	tmpl, err := template.New("index").Parse(string(indexHTML))
@@ -116,6 +116,68 @@ func (gen *Generator) generateIndex() string {
 	err = tmpl.Execute(&buf, index)
 	if err != nil {
 		log.WithField("error", err).Fatal("Error executing index template")
+	}
+	return buf.String()
+}
+
+func (gen *Generator) generateFront() string {
+	frontHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/front.html", gen.config.Site.Theme))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error reading index template")
+	}
+
+	page := Page{
+		Header:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
+		Nav:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
+		SingleKB: KBs["front"],
+		Footer:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
+	}
+
+	tmpl, err := template.New("front").Parse(string(frontHTML))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error parsing index template")
+	}
+
+	var buf strings.Builder
+	err = tmpl.Execute(&buf, page)
+	if err != nil {
+		log.WithField("error", err).Fatal("Error executing index template")
+	}
+	return buf.String()
+}
+
+func (gen *Generator) generateKB(kb KB) string {
+	kbHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/kb.html", gen.config.Site.Theme))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error read post template")
+	}
+
+	page := Page{
+		Header:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), kb),
+		Nav:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), kb),
+		SingleKB: &kb,
+		Footer:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), kb),
+	}
+
+	// if strings.Contains(post.FrontMatter.Slug, "bloat") {
+	// 	log.WithField("post", post.HTML).Info("Generated post")
+	// }
+
+	uttmpl, _ := template.New("utPage").Parse(kb.HTML)
+	var templatedOut strings.Builder
+	err = uttmpl.Execute(&templatedOut, page)
+
+	kb.HTML = templatedOut.String()
+
+	tmpl, err := template.New("page").Parse(string(kbHTML))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error parsing post template")
+	}
+
+	var buf strings.Builder
+	err = tmpl.Execute(&buf, page)
+	if err != nil {
+		log.WithField("error", err).Fatal("Error executing post template")
 	}
 	return buf.String()
 }
@@ -155,9 +217,9 @@ func (gen *Generator) generateFeeds() (string, string, string) {
 
 	for _, post := range posts {
 		item := &feeds.Item{
-			Id:          fmt.Sprintf("https://yulian.kuncheff.com/%s/", post.FrontMatter.Slug),
+			Id:          fmt.Sprintf("https://yulian.kuncheff.com/blog/%s/", post.FrontMatter.Slug),
 			Title:       post.FrontMatter.Title,
-			Link:        &feeds.Link{Href: fmt.Sprintf("https://yulian.kuncheff.com/%s/", post.FrontMatter.Slug)},
+			Link:        &feeds.Link{Href: fmt.Sprintf("https://yulian.kuncheff.com/blog/%s/", post.FrontMatter.Slug)},
 			Created:     post.FrontMatter.OrigDate,
 			Description: post.Summary,
 			Author:      &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},

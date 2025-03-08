@@ -65,11 +65,11 @@ func (h *Handler) IndexHandler(c echo.Context) error {
 }
 
 func (h *Handler) PostHandler(c echo.Context) error {
-	prefix := "/posts"
+	prefix := "/blog"
 	if strings.HasPrefix(c.Request().URL.Path, fmt.Sprintf("%s/", prefix)) {
 		log.WithField("file", fmt.Sprintf("%s.html", c.Request().URL.Path)).Info("Serving file")
 
-		out, err := utils.ReadFileToString(h.output, fmt.Sprintf("%s.html", c.Request().URL.Path[1:]))
+		out, err := utils.ReadFileToString(h.output, fmt.Sprintf("%s/index.html", c.Request().URL.Path[1:]))
 		if err != nil {
 			log.WithField("error", err).Error("Error reading file")
 			c.Error(err)

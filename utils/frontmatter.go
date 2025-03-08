@@ -34,7 +34,7 @@ func ModifyDate(date string) string {
 	layout := "2006-01-02T15:04:05Z"
 	t, err := time.Parse(layout, date)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing date")
+		log.WithField("error", err).Fatal("Error modifying date")
 		panic(err)
 	}
 

@@ -12,7 +12,7 @@ tags:
   - selectivism
 ---
 
-<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
+@![Some PHP on a screen at an angle](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "{{\(index .Posts 0\).FrontMatter.Title}}"){"avif,jxl,webp"}
 
 This is an opinion and a rant based on my opinion and observations, you have been warned.
 

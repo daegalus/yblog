@@ -25,7 +25,7 @@ Next order of business, was where to run it. I normally run most of my things in
 
 I setup SONM first, seeing as this was the newest tech, I figured I would see if it even works before investing time working towards it. Plus besides previous mini-tests, this is the first time I setup SONM for actual work.
 
-<img src="/images/${slug}/somn-setup" alt="A picture of the terminal with the setup of the SOMN miner" transform-images="avif jxl webp png" />
+@![A picture of the terminal with the setup of the SOMN miner](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/somn-setup.png "A picture of the terminal with the setup of the SOMN miner"){"avif,jxl,webp"}
 
 As you can see from the picture above, it all went pretty smoothly. My droplet has an external IP and I didn't have to change any of the default config settings. I just ran the hub and miner, and it all worked out. That was absolutely painless. I used the precompiled Linux binaries for this and it all worked swimmingly.
 
@@ -39,7 +39,7 @@ Finally, after tons of tinkering with the image, I finally succeeded, and actual
 
 And once I got the image up and running, I was able to log into the game and play agains the bots. Did a little more tinkering with the image to allow for the user to pass in a GSLT token to so the server didn't start in LAN Only mode.
 
-<img src="/images/${slug}/csgo-server-running" alt="Logs from he CS GO docker server running." transform-images="avif jxl webp png" />
+@![Logs from he CS GO docker server running.](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/csgo-server-running.png "Logs from he CS GO docker server running."){"avif,jxl,webp"}
 
 After all that, you would think that getting SONM to run it would be even easier now that I have an image it can wrong. But thats where my assumptions fell. Because I needed to pass in that GSLT token to run a basic server, I needed to find a way to pass it in. After much searching through the SONM code, I found that there is no way to actually pass in environment variables from the task.yaml file that is used by the hub and miner. But I did find a test that shows you can pass in a `command` parameter with the startup command.
 
@@ -47,7 +47,7 @@ With that in mind, I modified the start script to take an optional parameter. St
 
 Nothing, it started in LAN only mode. Turns out, the `command` parameter is either no longer used, or never got hooked up, as it doesn't do anything.
 
-<img src="/images/${slug}/csgo-lanonly-somn-task" alt="Logs from SOMN task running CS GO in LanOnly mode." transform-images="avif jxl webp png" />
+@![Logs from SOMN task running CS GO in LanOnly mode.](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/csgo-lanonly-somn-task.png "Logs from SOMN task running CS GO in LanOnly mode."){"avif,jxl,webp"}
 
 The picture above shows a working CS:GO server in LAN Only mode, running in a Docker container, launched as a task sent to the SONM hub, and is being run by the SONM Miner. It works, I was impressed.
 
@@ -59,7 +59,7 @@ I do have to say, I am very impressed with SONM and what they have accomplished 
 
 I leave you with this final image of the SONM Docker server showing up and joinable from the CS:GO server browser. I did launch the server directly, so the docker container is up and running, and people can play on the server. The IP in the images will work, and if the server is up (should be at the time of this writing), you can hop in and play.
 
-<img src="/images/${slug}/csgo-server-browser" alt="Ingame CSGO server browser showing our browser." transform-images="avif jxl webp png" />
+@![Ingame CSGO server browser showing our browser.](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/csgo-server-browser.png "Ingame CSGO server browser showing our browser."){"avif,jxl,webp"}
 
 *PS: I know this isn't a very technical blog post, but I wanted to just talk about the experience of working with all this.*
 

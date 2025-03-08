@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"image"
 	"io/fs"
+	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
+	"time"
 	"yblog/utils"
 	"yblog/utils/goldmark_extensions"
 
@@ -167,7 +170,13 @@ func (gen *Generator) CompileMarkdown() {
 	imageStoragePath := "images"
 
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Output, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, "")
-	utils.CopyFiles(gen.Cache, gen.Output, filepath.Join(CachePrefix, imageStoragePath), CachePrefix, "")
+	if _, err := fs.Stat(os.DirFS(""), CachePrefix); err != nil {
+		log.WithField("prefix", CachePrefix).Info("Folder Exists")
+		if _, err := fs.Stat(os.DirFS(""), filepath.Join(CachePrefix, imageStoragePath)); err != nil {
+			log.WithField("prefix", filepath.Join(CachePrefix, imageStoragePath)).Info("Folder Exists")
+			utils.CopyFiles(gen.Cache, gen.Output, filepath.Join(CachePrefix, imageStoragePath), CachePrefix, "")
+		}
+	}
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Cache, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, CachePrefix)
 
 	// afero.Walk(gen.Output, ".", func(path string, info fs.FileInfo, err error) error {
@@ -207,79 +216,164 @@ func (gen *Generator) CompileMarkdown() {
 			html.WithHardWraps(),
 		),
 	)
-	contentPath := "content/blog"
-	files, _ := fs.ReadDir(Content, contentPath)
+	contentPathBlog := "content/blog"
+	files, _ := fs.ReadDir(Content, contentPathBlog)
 	for _, file := range files {
-		data, err := Content.ReadFile(filepath.Join(contentPath, file.Name()))
-		if err != nil {
-			log.WithField("error", err).Fatal("Error reading file")
-			panic(err)
-		}
-
-		content, _ := utils.StripFrontMatter(data)
-		//filename := strings.Split(file.Name(), ".")[0]
-
-		context := parser.NewContext()
-		var out strings.Builder
-
-		err = md.Convert(data, &out, parser.WithContext(context))
-		if err != nil {
-			log.WithField("error", err).Fatal("Error converting markdown")
-			panic(err)
-		}
-
-		// if strings.Contains(file.Name(), "bloat") {
-		// 	fmt.Println(out.String())
-		// }
-
-		metaData := meta.Get(context)
-
-		tagsInterface := metaData["tags"].([]interface{})
-		tagsStringList := make([]string, len(tagsInterface))
-		for i, v := range tagsInterface {
-			tagsStringList[i] = v.(string)
-		}
-
-		frontmatter := utils.FrontMatter{
-			Author:   metaData["author"].(string),
-			OrigDate: utils.ParseDate(metaData["date"].(string)),
-			Date:     utils.ModifyDate(metaData["date"].(string)),
-			Draft:    metaData["draft"].(bool),
-			Slug:     metaData["slug"].(string),
-			Title:    metaData["title"].(string),
-			Type:     metaData["type"].(string),
-			Tags:     tagsStringList,
-		}
-
-		post := Post{
-			FrontMatter: frontmatter,
-			Markdown:    content,
-			HTML:        out.String(),
-		}
-
-		gen.generateSummary(&post)
-
-		Posts[frontmatter.Slug] = &post
-
-		for _, tag := range post.FrontMatter.Tags {
-			TaggedPosts[tag] = append(TaggedPosts[tag], &post)
-
-		}
-		hashtags := []string{}
-		for _, tag := range post.FrontMatter.Tags {
-			hashtags = append(hashtags, fmt.Sprintf("#%s", tag))
-		}
-		post.Tagsline = strings.Join(hashtags, " | ")
-		html := gen.generatePost(post)
-		gen.Output.MkdirAll("posts", fs.ModeDir)
-		afero.WriteFile(gen.Output, fmt.Sprintf("posts/%s.html", frontmatter.Slug), []byte(html), fs.ModePerm)
+		gen.CompileMarkdownFile(file, contentPathBlog, "post", md)
 	}
 
 	html := gen.generateIndex()
-	afero.WriteFile(gen.Output, "index.html", []byte(html), fs.ModePerm)
+	afero.WriteFile(gen.Output, "blog/index.html", []byte(html), fs.ModePerm)
+
+	contentPathKB := "content/kb"
+	files, _ = fs.ReadDir(Content, contentPathKB)
+	for _, file := range files {
+		gen.CompileMarkdownFile(file, contentPathKB, "kb", md)
+	}
 
 	atom, rss, json := gen.generateFeeds()
 	afero.WriteFile(gen.Output, "feed.atom", []byte(atom), fs.ModePerm)
 	afero.WriteFile(gen.Output, "feed.rss", []byte(rss), fs.ModePerm)
 	afero.WriteFile(gen.Output, "feed.json", []byte(json), fs.ModePerm)
+}
+
+func sortComments(legacyComments []*LegacyComment) []*LegacyComment {
+	slices.SortFunc(legacyComments, func(i, j *LegacyComment) int {
+		iCA, _ := time.Parse(time.RFC3339, i.CreatedAt+"Z")
+		jCA, _ := time.Parse(time.RFC3339, j.CreatedAt+"Z")
+		return int(iCA.UnixMilli() - jCA.UnixMilli())
+	})
+	return legacyComments
+}
+
+func sortChildrenComments(legacyComments []*LegacyComment) []*LegacyComment {
+	legacyComments = sortComments(legacyComments)
+	for _, comment := range legacyComments {
+		comment.Children = sortChildrenComments(comment.Children)
+	}
+	return legacyComments
+}
+
+func (gen *Generator) CompileMarkdownFile(file fs.DirEntry, contentPath string, contentType string, md goldmark.Markdown) {
+	if !strings.Contains(file.Name(), ".md") {
+		return
+	}
+	data, err := Content.ReadFile(filepath.Join(contentPath, file.Name()))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error reading file")
+		panic(err)
+	}
+
+	content, _ := utils.StripFrontMatter(data)
+
+	context := parser.NewContext()
+	var out strings.Builder
+
+	err = md.Convert(data, &out, parser.WithContext(context))
+	if err != nil {
+		log.WithField("error", err).Fatal("Error converting markdown")
+		panic(err)
+	}
+
+	metaData := meta.Get(context)
+
+	tagsInterface := metaData["tags"].([]interface{})
+	tagsStringList := make([]string, len(tagsInterface))
+	for i, v := range tagsInterface {
+		tagsStringList[i] = v.(string)
+	}
+
+	frontmatter := utils.FrontMatter{
+		Author:   metaData["author"].(string),
+		OrigDate: utils.ParseDate(metaData["date"].(string)),
+		Date:     utils.ModifyDate(metaData["date"].(string)),
+		Draft:    metaData["draft"].(bool),
+		Slug:     metaData["slug"].(string),
+		Title:    metaData["title"].(string),
+		Type:     metaData["type"].(string),
+		Tags:     tagsStringList,
+	}
+
+	switch contentType {
+	case "post":
+		gen.postSpecific(frontmatter, content, out.String())
+	case "kb":
+		gen.kbSpecific(frontmatter, content, out.String())
+	}
+
+}
+
+func (gen *Generator) postSpecific(frontmatter utils.FrontMatter, content []byte, html string) {
+	legacyPostComments := GetLegacyComments()
+
+	legacyComments := []*LegacyComment{}
+	if _, ok := (*legacyPostComments)[frontmatter.Slug]; ok {
+		for _, comment := range *(*legacyPostComments)[frontmatter.Slug].Comments {
+			legacyComments = append(legacyComments, comment)
+		}
+	}
+
+	legacyComments = sortChildrenComments(legacyComments)
+
+	post := Post{
+		FrontMatter:    frontmatter,
+		Markdown:       content,
+		HTML:           html,
+		LegacyComments: legacyComments,
+	}
+
+	gen.generateSummary(&post)
+
+	Posts[frontmatter.Slug] = &post
+
+	for _, tag := range post.FrontMatter.Tags {
+		TaggedPosts[tag] = append(TaggedPosts[tag], &post)
+
+	}
+	hashtags := []string{}
+	for _, tag := range post.FrontMatter.Tags {
+		hashtags = append(hashtags, fmt.Sprintf("#%s", tag))
+	}
+	post.Tagsline = strings.Join(hashtags, " | ")
+
+	htmlOut := gen.generatePost(post)
+
+	gen.Output.MkdirAll("posts", fs.ModeDir)
+	afero.WriteFile(gen.Output, fmt.Sprintf("blog/posts/%s.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
+	gen.Output.MkdirAll(fmt.Sprintf("$s", frontmatter.Slug), fs.ModeDir)
+	afero.WriteFile(gen.Output, fmt.Sprintf("blog/%s/index.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
+}
+
+func (gen *Generator) kbSpecific(frontmatter utils.FrontMatter, content []byte, html string) {
+
+	kb := KB{
+		FrontMatter: frontmatter,
+		Markdown:    content,
+		HTML:        html,
+	}
+
+	KBs[frontmatter.Slug] = &kb
+
+	for _, tag := range kb.FrontMatter.Tags {
+		TaggedKBs[tag] = append(TaggedKBs[tag], &kb)
+
+	}
+	hashtags := []string{}
+	for _, tag := range kb.FrontMatter.Tags {
+		hashtags = append(hashtags, fmt.Sprintf("#%s", tag))
+	}
+	kb.Tagsline = strings.Join(hashtags, " | ")
+
+	var htmlOut string
+	if kb.FrontMatter.Slug == "front" {
+		htmlOut = gen.generateFront()
+		afero.WriteFile(gen.Output, "index.html", []byte(htmlOut), fs.ModePerm)
+	} else {
+		htmlOut = gen.generateKB(kb)
+		gen.Output.MkdirAll("kb", fs.ModeDir)
+		afero.WriteFile(gen.Output, fmt.Sprintf("kb/pages/%s.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
+		gen.Output.MkdirAll(fmt.Sprintf("$s", frontmatter.Slug), fs.ModeDir)
+		afero.WriteFile(gen.Output, fmt.Sprintf("kb/%s/index.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
+	}
+
 }

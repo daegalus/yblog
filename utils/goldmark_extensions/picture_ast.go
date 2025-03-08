@@ -19,9 +19,7 @@ func (n *PictureSet) Dump(source []byte, level int) {
 	m["Title"] = string(n.Title)
 
 	strSources := []string{}
-	for _, source := range n.Sources {
-		strSources = append(strSources, source)
-	}
+	strSources = append(strSources, n.Sources...)
 	m["Sources"] = strings.Join(strSources, "")
 	ast.DumpHelper(n, source, level, m, nil)
 }

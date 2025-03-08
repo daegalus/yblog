@@ -14,7 +14,7 @@ tags:
   - engines
 ---
 
-<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
+@![Monogame Logo](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "{{\(index .Posts 0\).FrontMatter.Title}}"){"avif,jxl,webp"}
 
 *Disclaimer: This is all opinion and personal preference. A lot of the frameworks and game engines I talk about are great, and its my own choices that make them subpar for me. Please take this as an opinion peace, I am not trying to sway anyone in any way, it is just an explanation on why I chose what I did in hopes it might give someone else some ideas.*
 

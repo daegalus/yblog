@@ -10,6 +10,30 @@
       <h1>{{(index .Posts 0).FrontMatter.Title}}</h1>
       <article>{{(index .Posts 0).HTML}}</article>
     </article>
+    <area class="comments">
+      {{ if (index .Posts 0).LegacyComments }}
+      <h3>Old Comments from Disqus</h3>
+      <ul>
+        {{range (index .Posts 0).LegacyComments}}
+          <li>
+            <h5>{{.AuthorName}} ({{.AuthorUsername}}) <time>{{.CreatedAt}}</time></h5>
+            <p>{{.Message}}</p>
+            {{template "comments" .}}
+          </li>
+        {{end}}        
+      </ul>
+      {{ end }}
+      {{- define "comments"}}
+      <ul>
+        {{range .Children}}
+          <li>
+            <h5>{{.AuthorName}} ({{.AuthorUsername}}) <time>{{.CreatedAt}}</time></h5>
+            <p>{{.Message}}</p>
+            {{template "comments" .}}
+          </li>
+        {{end}}
+      </ul>
+      {{- end}}
     {{.Footer}}
   </body>
 </html>

@@ -14,7 +14,7 @@ tags:
   - web
 ---
 
-<img src="/images/${slug}/debug_console" alt="Jetbrains IntelliJ/Webstorm debug console" transform-images="avif jxl webp png" />
+@![Jetbrains IntelliJ/Webstorm debug console](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/debug_console.png "Jetbrains IntelliJ/Webstorm debug console"){"avif,jxl,webp"}
 
 Since I feel that the Dart Plugin in IntelliJ is at a point where it can do most, if not all things that the Dart Editor can do. I thought I would show how to setup debugging of Web Applications.
 Primarily because a certain few on IRC wanted a step-by-step guide because they were too lazy to figure it out (you know who you are..... Don). Seeing how I have been Evangelizing IntelliJ/Webstorm on
@@ -34,32 +34,34 @@ Setting up the project is pretty straightforward. If you are starting a new proj
 If you already have a working project, and you just want to switch IDEs, I find this approach the quickest and least error prone. Hit new Project and select "Dart Web Application", and set the Project
 and Module settings to the same root folder (makes life easier later). Make sure the Dart SDK path is right. If you have at any point added a Dart SDK anywhere, it should auto-fill for you.
 
-<img src="/images/${slug}/create_project" alt="Creating a dart web application in Jetbrains IntelliJ/Webstorm" transform-images="avif jxl webp png" />
+@![Creating a dart web application in Jetbrains IntelliJ/Webstorm](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/create_project.png "Creating a dart web application in Jetbrains IntelliJ/Webstorm"){"avif,jxl,webp"}
+
+@![Jetbrains IntelliJ/Webstorm debug console](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/debug_console.png "Jetbrains IntelliJ/Webstorm debug console"){"avif,jxl,webp"}
 
 ### Browser Setup
 
 This is just to make Dart Debuggin easier, but this is global, so you are welcome to set this up to your preference in any other way. In my settings below, I override the default browser with Dartium,
 and also the Chrome location. This will make sure no matter how it wants to open Chrome, it will be Dartium. This setting should be easily found in both IDE versions.
 
-<img src="/images/${slug}/browser_setup" alt="Configuring web browsers in Jetbrains IntelliJ/WebStorm" transform-images="avif jxl webp png" />
+@![Configuring web browsers in Jetbrains IntelliJ/WebStorm](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/browser_setup.png "Configuring web browsers in Jetbrains IntelliJ/WebStorm"){"avif,jxl,webp"}
 
 ### Debugging
 
 At this point you should be ready to go. The final step is to debug the app. Find the primary HTML file in you folder structure, right-click it, and hit 'Debug "x.html"'
 
-<img src="/images/${slug}/debug_menu" alt="Menu entry for debugging a dart web app" transform-images="avif jxl webp png" />
+@![Menu entry for debugging a dart web app](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/debug_menu.png "Menu entry for debugging a dart web app"){"avif,jxl,webp"}
 
 It will open up, but it seems like nothing worked right (this happens only the first time). The reason being is that IntelliJ uses its own Plugin to support their debugging and hook into the browser. It will redirect you to the download page, and ask you to install it. You need to install this.
 
-<img src="/images/${slug}/jetbrains_extension" alt="Installing the Jetbrains IDE extension in the browser" transform-images="avif jxl webp png" />
+@![Installing the Jetbrains IDE extension in the browser](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/jetbrains_extension.png "Installing the Jetbrains IDE extension in the browser"){"avif,jxl,webp"}
 
 Once this is installed, it will automatically continue where it left off, load the page, and hook in the debugger.
 
-<img src="/images/${slug}/browser_running" alt="Application running in the browser" transform-images="avif jxl webp png" />
+@![Application running in the browser](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/browser_running.png "Application running in the browser"){"avif,jxl,webp"}
 
 And now if we switch back to the IDE we can see the debugger hooked and running.
 
-<img src="/images/${slug}/debug_console" alt="Jetbrains IntelliJ/Webstorm debug console" transform-images="avif jxl webp png" />
+@![Jetbrains IntelliJ/Webstorm debug console](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/debug_console.png "Jetbrains IntelliJ/Webstorm debug console"){"avif,jxl,webp"}
 
 You can see console output in the console tab. Debugger tab will have all your watches and object views when you hit a breakpoint, and the Scripts tab I assume is for SourceMaps and other stuff for debugging.
 
@@ -83,15 +85,15 @@ But how do you make access this easy? and have the debugger turned on?
 
 Well, we need to make a new custom configuration for the project, and use that. In order to create a custom configuration, there is a dropdown box in the toolbar at the top, right before the Run and Debug buttons. Open the dropdown and hit "Edit Configuration".
 
-<img src="/images/${slug}/edit_conf_dropdown" alt="Edit Configuration dropdown in Jetbrains IntelliJ/WebStorm" transform-images="avif jxl webp png" />
+@![Edit Configuration dropdown in Jetbrains IntelliJ/WebStorm](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/edit_conf_dropdown.png "Edit Configuration dropdown in Jetbrains IntelliJ/WebStorm"){"avif,jxl,webp"}
 
 Once in the configuration screen, hit the **+** button at the top left, hover over "JavaScript Debug", and select Remote from the popout list.
 
-<img src="/images/${slug}/edit_conf_plus" alt="Selecting a new entry type to add." transform-images="avif jxl webp png" />
+@![Selecting a new entry type to add.](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/edit_conf_plus.png "Selecting a new entry type to add."){"avif,jxl,webp"}
 
 Now set it up for Chrome, with the localhost URL I posted above, and adjust it to your project (You can test in a normal browser before-hand). Once its to your liking, you can ignore the mapping, hit apply, ok. And you are set.
 
-<img src="/images/${slug}/edit_conf_remote" alt="Setting up the remote configuration." transform-images="avif jxl webp png" />
+@![Setting up the remote configuration.](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/edit_conf_remote.png "Setting up the remote configuration."){"avif,jxl,webp"}
 
 Now here is the difference. You can no longer use the right-click menu to launch, as that always uses the "Local" configuration. You need to select your configuration in the dropdown in the toolbar, and hit the "Debug" button next to it. It should launch, with fulld debugging enabled.
 

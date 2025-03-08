@@ -12,7 +12,7 @@ tags:
   - selectivism
 ---
 
-<img src="/images/${slug}/cover.png" transform-images="avif jxl webp png" />
+@![OAuth Logo](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "{{\(index .Posts 0\).FrontMatter.Title}}"){"avif,jxl,webp"}
 
 One thing that really bugs me lately is the selective use of OAuth providers. Specifically, Facebook. It is one of my pet peeves when I come to a site that I want to try out, but they require Facebook in order to login. I rarely if ever use Facebook, I personally hate using Facebook (rant for another day), but I have one, for some basic connections and logging into places if I really have to.
 

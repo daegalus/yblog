@@ -23,7 +23,7 @@ func ReadFileToString(fileSys afero.Fs, filename string) (string, error) {
 func CopyFiles(input afero.Fs, output afero.Fs, rootPath string, stripPrefix string, replacementPrefix string) {
 	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error reading files during copyfiles walk")
 		}
 		if info.IsDir() {
 			return nil
@@ -44,13 +44,13 @@ func CopyFiles(input afero.Fs, output afero.Fs, rootPath string, stripPrefix str
 
 		in, err := afero.ReadFile(input, path)
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files")
+			log.WithError(err).Fatal("Error reading input file during copyFiles Walk")
 		}
 		afero.WriteFile(output, targetPath, in, 0644)
 
 		return nil
 	})
 	if err != nil {
-		log.WithError(err).Fatal("Error reading files")
+		log.WithError(err).Fatal("Error walking files during copyFiles")
 	}
 }

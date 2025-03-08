@@ -12,7 +12,7 @@ tags:
   - languages
 ---
 
-@![test](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "test"){"avif,jxl,webp"}
+@![A bloated python](/images/{{\(index .Posts 0\).FrontMatter.Slug}}/cover.png "{{\(index .Posts 0\).FrontMatter.Title}}"){"avif,jxl,webp"}
 
 *Disclaimer: After reading through this a few times, I realized my train of thought jumps around a lot on this. There is just so much going on in my head on this topic, its hard to not jump around. I apologize for the all over the place article. Hopefully my point is still conveyed.*
 

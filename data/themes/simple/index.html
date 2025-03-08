@@ -8,10 +8,10 @@
         {{ range .Posts }}
         <article class="post">
             <h5>{{.FrontMatter.Date}}<span style="float:right">{{.Tagsline}}</span></h5>
-            <a href="/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
+            <a href="/blog/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
             {{.Summary}} 
             <br>
-            <a href="/{{.FrontMatter.Slug}}"><span">Read more</span></a>
+            <a href="/blog/{{.FrontMatter.Slug}}"><span">Read more</span></a>
         </article>
         {{ end }}
 

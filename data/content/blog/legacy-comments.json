@@ -1,0 +1,898 @@
+{
+  "running-csgo-on-a-distributed-blockchain-compute-network": {
+    "id": 6129202941,
+    "title": "Running CS:GO on a Distributed Blockchain Compute Network",
+    "slug": "running-csgo-on-a-distributed-blockchain-compute-network",
+    "comments": {
+      "3511798808": {
+        "id": 3511798808,
+        "author_name": "DroneHiTech",
+        "author_username": "dronehitech",
+        "author_location": "",
+        "message": "\u003cp\u003eThank you for sharing your experience with SONM! Could you explain a bit more in details why do you believe SONM has the potential to outperform Golem and their team? Best wishes, Sergey\u003c/p\u003e",
+        "raw_message": "Thank you for sharing your experience with SONM! Could you explain a bit more in details why do you believe SONM has the potential to outperform Golem and their team? Best wishes, Sergey",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2017-09-11T06:15:32",
+        "parent": -1,
+        "children": [
+          {
+            "id": 3512260956,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eIt is mostly because of the capabilities of SONM over Golem. Golem for the longest time didn't have anything other than image rendering, and nothing with Docker. They were delayed heavily and took over a 6 month delay to release Brass Golem.\u003c/p\u003e\u003cp\u003eI think they saw Sonm and decided to rework it to be Docker based, at least I know they install docker and virtual box when you install the latest Golem.\u003c/p\u003e\u003cp\u003eBut they still have only image rendering support. A year and a half of development and only image rendering.\u003c/p\u003e\u003cp\u003eSONM comes in, with only 3-4 months of development before the ICO, releases a Quake3 prototype during the ICO, and can already run anything docker can. I just think the SONM team is technically stronger than the Golem team and have already shown it.\u003c/p\u003e\u003cp\u003eThere was a lot of FUD during the ICO and not so great PR handling from the SONM team which lead to misinformation and negative thoughts on SONM, but it has improved and it's the stronger product in my opinion.\u003c/p\u003e\u003cp\u003eI plan to do another article when they fix or add the environment variable stuff I mentioned.\u003c/p\u003e",
+            "raw_message": "It is mostly because of the capabilities of SONM over Golem. Golem for the longest time didn't have anything other than image rendering, and nothing with Docker. They were delayed heavily and took over a 6 month delay to release Brass Golem.\n\nI think they saw Sonm and decided to rework it to be Docker based, at least I know they install docker and virtual box when you install the latest Golem.\n\nBut they still have only image rendering support. A year and a half of development and only image rendering. \n\nSONM comes in, with only 3-4 months of development before the ICO, releases a Quake3 prototype during the ICO, and can already run anything docker can. I just think the SONM team is technically stronger than the Golem team and have already shown it.\n\nThere was a lot of FUD during the ICO and not so great PR handling from the SONM team which lead to misinformation and negative thoughts on SONM, but it has improved and it's the stronger product in my opinion.\n\nI plan to do another article when they fix or add the environment variable stuff I mentioned.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2017-09-11T15:00:17",
+            "parent": 3511798808,
+            "children": [
+              {
+                "id": 3512717268,
+                "author_name": "DroneHiTech",
+                "author_username": "dronehitech",
+                "author_location": "",
+                "message": "\u003cp\u003eThank you for the detailed answer, Yulian! This is an interesting information, considering the fact Golem has twice more devs in their team at the moment. Waiting for your next article on the topic. Best wishes, Sergey\u003c/p\u003e",
+                "raw_message": "Thank you for the detailed answer, Yulian! This is an interesting information, considering the fact Golem has twice more devs in their team at the moment. Waiting for your next article on the topic. Best wishes, Sergey",
+                "likes": 0,
+                "dislikes": 0,
+                "created_at": "2017-09-11T19:52:05",
+                "parent": 3512260956,
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "touch-devnull-language-fanboyism": {
+    "id": 910454220,
+    "title": "touch /dev/null — Language Fanboyism",
+    "slug": "touch-devnull-language-fanboyism",
+    "comments": {
+      "3007649853": {
+        "id": 3007649853,
+        "author_name": "medical editing services",
+        "author_username": "disqus_RfyHgCWovP",
+        "author_location": "UK",
+        "message": "\u003cp\u003eSharing that type of idea on how to programmers should use their chosen programming language is quite good especially that they might build some certain techniques on how to really become successful in what they are doing by choosing the right tool for them.\u003c/p\u003e",
+        "raw_message": "Sharing that type of idea on how to programmers should use their chosen programming language is quite good especially that they might build some certain techniques on how to really become successful in what they are doing by choosing the right tool for them.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2016-11-18T00:15:55",
+        "parent": -1,
+        "children": []
+      },
+      "810396517": {
+        "id": 810396517,
+        "author_name": "Guest",
+        "author_username": "",
+        "author_location": "",
+        "message": "",
+        "raw_message": "",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T05:51:17",
+        "parent": -1,
+        "children": []
+      },
+      "817328629": {
+        "id": 817328629,
+        "author_name": "irneb",
+        "author_username": "irneb",
+        "author_location": "",
+        "message": "\u003cp\u003eHa! Yep, in full agreement with you there.\u003c/p\u003e\u003cp\u003eThough I've found it's more of a situation of a \"programmer\" feels comfortable in what he's using at the moment. It's the age old fight against change. Having done my CS degree in the 90's I went through the usual Pascal / C++ / Java and at the end thought: \"Java seems to be the nicest thing to work in.\" Well, of those 3. Then my first real job was in Delphi, so the Pascal found its way back in my life, and I started thinking: \"What was I on about with Java?\" Later PHP, JavaScript, Python, VB, VBA, VB.Net, C#, etc. Much the same scenario applied, though I must say PHP gave me the same sic feeling as Perl, and to some measure C++, but that's due to it's enigma-code-like usage of strange and not-so-wonderful off-putting characters. Only after some years did I realize there's not much difference at all, except maybe for Lisp which I've had some dealings with since the late 80's. If I could find work which would allow me to use only Lisp, I'd drop everything else - but that's only because I can find everything I like in other languages are all combined in Lisp.\u003c/p\u003e\u003cp\u003eI feel a \"programmer\" needs to test as many languages as he can get his hands on - be that in his private time or not. Even if they're pigs, it might still give you ideas of how to go about coding in other (more mainstream) languages using more efficient / less verbose / more readable / easier managed / etc. coding concepts. I'm sure that if C programmers never looked at something like Symula, they'd never have thought to create C++ to add some OOP onto C. And if they never looked at Lisp (and its derivatives), then the recent functional stuff wouldn't even have been a consideration.\u003c/p\u003e\u003cp\u003eA caveat to this is there's no invention any more. For the past 50 years languages have been tweaked only. New languages were simply re-syntaxing of old stuff and combining ideas from various other ancestors. Nothing new has evolved since Lisp and Algol (the 2 extremes in \"3rd\" generation languages), perhaps Symula's OOP might be classed here, but it wasn't the first either. I.e. either from the maths side or from the physical switches side. Most languages try to find some balance between these two by taking parts from them, e.g. instead of Algol's conditional branches, C implemented the if-then-else idea from Lisp.\u003c/p\u003e\u003cp\u003eWhat I really want to see is something totally different. No new flavour on old stuff. But I realize this is something very difficult indeed.\u003c/p\u003e\u003cp\u003eSomething I don't understand though: Why is everything still just through simple text? Why has there not been some truly \"visual\" language created based on something like GraIL. \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.formfollowsfuckingfunction.net%2F2011%2F11%2F03%2Fgrail-graphical-input-language%2F%3Ax1xELi3lTOUyVoo_9nGi_CZo85w\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.formfollowsfuckingfunction.net/2011/11/03/grail-graphical-input-language/\"\u003ehttp://www.formfollowsfucki...\u003c/a\u003e\u003c/p\u003e",
+        "raw_message": "Ha! Yep, in full agreement with you there.\n\nThough I've found it's more of a situation of a \"programmer\" feels comfortable in what he's using at the moment. It's the age old fight against change. Having done my CS degree in the 90's I went through the usual Pascal / C++ / Java and at the end thought: \"Java seems to be the nicest thing to work in.\" Well, of those 3. Then my first real job was in Delphi, so the Pascal found its way back in my life, and I started thinking: \"What was I on about with Java?\" Later PHP, JavaScript, Python, VB, VBA, VB.Net, C#, etc. Much the same scenario applied, though I must say PHP gave me the same sic feeling as Perl, and to some measure C++, but that's due to it's enigma-code-like usage of strange and not-so-wonderful off-putting characters. Only after some years did I realize there's not much difference at all, except maybe for Lisp which I've had some dealings with since the late 80's. If I could find work which would allow me to use only Lisp, I'd drop everything else - but that's only because I can find everything I like in other languages are all combined in Lisp.\n\nI feel a \"programmer\" needs to test as many languages as he can get his hands on - be that in his private time or not. Even if they're pigs, it might still give you ideas of how to go about coding in other (more mainstream) languages using more efficient / less verbose / more readable / easier managed / etc. coding concepts. I'm sure that if C programmers never looked at something like Symula, they'd never have thought to create C++ to add some OOP onto C. And if they never looked at Lisp (and its derivatives), then the recent functional stuff wouldn't even have been a consideration.\n\nA caveat to this is there's no invention any more. For the past 50 years languages have been tweaked only. New languages were simply re-syntaxing of old stuff and combining ideas from various other ancestors. Nothing new has evolved since Lisp and Algol (the 2 extremes in \"3rd\" generation languages), perhaps Symula's OOP might be classed here, but it wasn't the first either. I.e. either from the maths side or from the physical switches side. Most languages try to find some balance between these two by taking parts from them, e.g. instead of Algol's conditional branches, C implemented the if-then-else idea from Lisp.\n\nWhat I really want to see is something totally different. No new flavour on old stuff. But I realize this is something very difficult indeed.\n\nSomething I don't understand though: Why is everything still just through simple text? Why has there not been some truly \"visual\" language created based on something like GraIL. http://www.formfollowsfuckingfunction.net/2011/11/03/grail-graphical-input-language/",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-03-02T13:58:54",
+        "parent": -1,
+        "children": []
+      }
+    }
+  },
+  "why-are-there-no-true-cross-platform-filesystems": {
+    "id": 1098093055,
+    "title": "Why are there no true cross-platform filesystems? - touch /dev/null",
+    "slug": "why-are-there-no-true-cross-platform-filesystems",
+    "comments": {
+      "3730623704": {
+        "id": 3730623704,
+        "author_name": "mathiassm",
+        "author_username": "mathiassm",
+        "author_location": "",
+        "message": "\u003cp\u003e5 years later and nothing has changed...\u003c/p\u003e",
+        "raw_message": "5 years later and nothing has changed...",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2018-01-28T18:48:14",
+        "parent": -1,
+        "children": [
+          {
+            "id": 3731122009,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eUnfortunately, it has not. UDF hasn't really changed any. There are multiple tools out there that help format UDF drives for USB storage, but they all have quirks related to the OS implementations.\u003c/p\u003e\u003cp\u003eI don't have the system programming/driver programming experience to do it myself. Right now your best bet is to either use UDF, ExFat, or deal with third party paid NTFS/HFS/Ext4 drivers.\u003c/p\u003e",
+            "raw_message": "Unfortunately, it has not. UDF hasn't really changed any. There are multiple tools out there that help format UDF drives for USB storage, but they all have quirks related to the OS implementations.\n\nI don't have the system programming/driver programming experience to do it myself. Right now your best bet is to either use UDF, ExFat, or deal with third party paid NTFS/HFS/Ext4 drivers.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2018-01-29T01:48:07",
+            "parent": 3730623704,
+            "children": []
+          }
+        ]
+      },
+      "810399411": {
+        "id": 810399411,
+        "author_name": "Jonathan Mergy",
+        "author_username": "jmergy",
+        "author_location": "San Francisco, CA",
+        "message": "\u003cp\u003eYou're right. I tried to go with ExFat and that is iffy. It is unfortunate. FAT32 does go a long way, but is problematic on larger files.\u003c/p\u003e",
+        "raw_message": "You're right. I tried to go with ExFat and that is iffy. It is unfortunate. FAT32 does go a long way, but is problematic on larger files.",
+        "likes": 2,
+        "dislikes": 0,
+        "created_at": "2013-02-24T05:55:24",
+        "parent": -1,
+        "children": []
+      },
+      "810399847": {
+        "id": 810399847,
+        "author_name": "Mridul Pentapalli",
+        "author_username": "disqus_UEcibktrd9",
+        "author_location": "",
+        "message": "\u003cp\u003eI am a developer for MacDrive. We provide HFS+ support for windows. (Shameless plug) \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.mediafour.com%2Fmacdrive%3A5yRcj9MgvZkaRX3oUfAo3hoA224\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.mediafour.com/macdrive\"\u003ehttp://www.mediafour.com/ma...\u003c/a\u003e\u003c/p\u003e\u003cp\u003eI think HFS+ is a good bet across all three OSes for now.\u003c/p\u003e",
+        "raw_message": "I am a developer for MacDrive. We provide HFS+ support for windows. (Shameless plug) http://www.mediafour.com/macdrive\n\nI think HFS+ is a good bet across all three OSes for now.",
+        "likes": 11,
+        "dislikes": 0,
+        "created_at": "2013-02-24T05:56:01",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812324890,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eI'll look into it. I've tried it many years ago, and I felt it slow then, but I will admit that I have not tried it recently, and I will give it a second chance, as time has passed and large room for improvement in that time.\u003c/p\u003e",
+            "raw_message": "I'll look into it. I've tried it many years ago, and I felt it slow then, but I will admit that I have not tried it recently, and I will give it a second chance, as time has passed and large room for improvement in that time.",
+            "likes": 2,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:21:01",
+            "parent": 810399847,
+            "children": []
+          },
+          {
+            "id": 810699357,
+            "author_name": "Jesse Donat",
+            "author_username": "donatj",
+            "author_location": "MN",
+            "message": "\u003cp\u003eI use MacDrive for this purpose, even having my iPod formatted HFS+ and it works incredibly well.\u003c/p\u003e",
+            "raw_message": "I use MacDrive for this purpose, even having my iPod formatted HFS+ and it works incredibly well.",
+            "likes": 1,
+            "dislikes": 0,
+            "created_at": "2013-02-24T14:42:51",
+            "parent": 810399847,
+            "children": []
+          }
+        ]
+      },
+      "810401945": {
+        "id": 810401945,
+        "author_name": "Jon Watte",
+        "author_username": "jonwatte",
+        "author_location": "",
+        "message": "\u003cp\u003eI use nilfs on linux and am happy. The future is flash! Just wish it had win/mac drivers.\u003cbr\u003eFor real, though, I use virtualization rather than multi boot. This lets me use hgfs across os-es, and switch os without rebooting. Vmware workstation is very much worth the money. If you don't like paying for software, just view it as a hardware upgrade :-)\u003c/p\u003e",
+        "raw_message": "I use nilfs on linux and am happy. The future is flash! Just wish it had win/mac drivers.\nFor real, though, I use virtualization rather than multi boot. This lets me use hgfs across os-es, and switch os without rebooting. Vmware workstation is very much worth the money. If you don't like paying for software, just view it as a hardware upgrade :-)",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T05:59:27",
+        "parent": -1,
+        "children": [
+          {
+            "id": 810441954,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eI use virtualization where I can, but running various development tools like Visual Studio and Xcode for mobile dev. Then when you debug with the Emulators/Simulators, its even slower for VM in VM problems.\u003c/p\u003e",
+            "raw_message": "I use virtualization where I can, but running various development tools like Visual Studio and Xcode for mobile dev. Then when you debug with the Emulators/Simulators, its even slower for VM in VM problems.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-24T07:11:10",
+            "parent": 810401945,
+            "children": []
+          }
+        ]
+      },
+      "810422585": {
+        "id": 810422585,
+        "author_name": "disqus_APi7SCc8zd",
+        "author_username": "disqus_APi7SCc8zd",
+        "author_location": "",
+        "message": "\u003cp\u003eZFS has a library designed for portable userspace implementations.\u003c/p\u003e",
+        "raw_message": "ZFS has a library designed for portable userspace implementations.",
+        "likes": 5,
+        "dislikes": 0,
+        "created_at": "2013-02-24T06:36:24",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812324465,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYes, but there doesn't seem to be one that exists for Windows yet or in workable condition. and OSX has a read-only one.\u003c/p\u003e",
+            "raw_message": "Yes, but there doesn't seem to be one that exists for Windows yet or in workable condition. and OSX has a read-only one.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:20:10",
+            "parent": 810422585,
+            "children": [
+              {
+                "id": 813047309,
+                "author_name": "Amber Rose",
+                "author_username": "disqus_mZVIY59S4q",
+                "author_location": "",
+                "message": "\u003cp\u003e\u003ca href=\"https://disq.us/url?url=https%3A%2F%2Fcode.google.com%2Fp%2Fmaczfs%2F%3AUTG4iAduB4MpYQ2IeuhD3pftOVw\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"https://code.google.com/p/maczfs/\"\u003ehttps://code.google.com/p/m...\u003c/a\u003e\u003c/p\u003e",
+                "raw_message": "https://code.google.com/p/maczfs/",
+                "likes": 0,
+                "dislikes": 0,
+                "created_at": "2013-02-26T16:28:27",
+                "parent": 812324465,
+                "children": [
+                  {
+                    "id": 813093908,
+                    "author_name": "Yulian Kuncheff",
+                    "author_username": "Daegalus",
+                    "author_location": "Berkeley, CA",
+                    "message": "\u003cp\u003eI stand corrected, my search lead me to a abandoned maczfs attempt that was read-only, so I just thought it was that. Thanks for the link.\u003c/p\u003e\u003cp\u003eDoesn't help on Windows still.\u003c/p\u003e",
+                    "raw_message": "I stand corrected, my search lead me to a abandoned maczfs attempt that was read-only, so I just thought it was that. Thanks for the link.\n\n\nDoesn't help on Windows still.",
+                    "likes": 0,
+                    "dislikes": 0,
+                    "created_at": "2013-02-26T17:24:13",
+                    "parent": 813047309,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "810422746": {
+        "id": 810422746,
+        "author_name": "orclev",
+        "author_username": "orclev",
+        "author_location": "",
+        "message": "\u003cp\u003eThe single biggest problem is that with the exception of Linux (and the BSDs) it's somewhat difficult to create and distribute a filesystem driver. Doing anything kernel level in Windows is always a nasty prospect (ugh, visual C++, kill me now, and that's without even mentioning the horror that is Microsofts standard libraries), and I know next to nothing about the internal architecture of OS X, but I'm sure doing anything there will involve the purchase of some pricey Apple hardware and signing up for a developer account of some kind just to access the API docs.\u003c/p\u003e\u003cp\u003eGiven the above, is it really any suprise that support for alternative filesystems on OS X and Windows is in such a sorry state (slightly better on OS X, but that's mostly because OS X gets a lot of freebies from it's Unix heritage)?\u003c/p\u003e\u003cp\u003eIt is unfortunate that NTFS has such poor performance in Linux, but as you point out, it's reverse engineered so the fact it works at all is amazing. That said, I still wouldn't want to use NTFS for anything as it has some less than desirable characteristics.\u003c/p\u003e",
+        "raw_message": "The single biggest problem is that with the exception of Linux (and the BSDs) it's somewhat difficult to create and distribute a filesystem driver. Doing anything kernel level in Windows is always a nasty prospect (ugh, visual C++, kill me now, and that's without even mentioning the horror that is Microsofts standard libraries), and I know next to nothing about the internal architecture of OS X, but I'm sure doing anything there will involve the purchase of some pricey Apple hardware and signing up for a developer account of some kind just to access the API docs.\n\n\n\nGiven the above, is it really any suprise that support for alternative filesystems on OS X and Windows is in such a sorry state (slightly better on OS X, but that's mostly because OS X gets a lot of freebies from it's Unix heritage)?\n\n\nIt is unfortunate that NTFS has such poor performance in Linux, but as you point out, it's reverse engineered so the fact it works at all is amazing. That said, I still wouldn't want to use NTFS for anything as it has some less than desirable characteristics.",
+        "likes": 4,
+        "dislikes": 0,
+        "created_at": "2013-02-24T06:36:41",
+        "parent": -1,
+        "children": []
+      },
+      "810430821": {
+        "id": 810430821,
+        "author_name": "thomasfedb",
+        "author_username": "disqus_7Tmg0JhSa4",
+        "author_location": "",
+        "message": "\u003cp\u003eHave you considered a NAS mounted on your home directory? Icky but might be the simplest solution, and over gigabit might be acceptably speedy.\u003c/p\u003e",
+        "raw_message": "Have you considered a NAS mounted on your home directory? Icky but might be the simplest solution, and over gigabit might be acceptably speedy.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T06:51:13",
+        "parent": -1,
+        "children": [
+          {
+            "id": 810441249,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYa, seems to be suggested a lot, I kind of dismissed it due to the poor performance I have gotten out of my Linkstation NAS, but that could be purely an issue with this particular box/company. I might give it another shot with something custom, or Synology.\u003c/p\u003e",
+            "raw_message": "Ya, seems to be suggested a lot, I kind of dismissed it due to the poor performance I have gotten out of my Linkstation NAS, but that could be purely an issue with this particular box/company. I might give it another shot with something custom, or Synology.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-24T07:09:52",
+            "parent": 810430821,
+            "children": []
+          }
+        ]
+      },
+      "810433152": {
+        "id": 810433152,
+        "author_name": "dpwiz",
+        "author_username": "dpwiz",
+        "author_location": "",
+        "message": "\u003cp\u003eCross-platform FS today is a SMB/NFS-attached box.\u003c/p\u003e",
+        "raw_message": "Cross-platform FS today is a SMB/NFS-attached box.",
+        "likes": 2,
+        "dislikes": 0,
+        "created_at": "2013-02-24T06:55:20",
+        "parent": -1,
+        "children": [
+          {
+            "id": 811121839,
+            "author_name": "Rob Stutton",
+            "author_username": "disqus_bBZ3OXw7p7",
+            "author_location": "",
+            "message": "\u003cp\u003eAgreed, a NAS or fileshare of some-kind is the only answer. I would go further and say that any attempt to create a cross-platform FS that includes both Windows \u0026amp; OS X is futile. Both of these OSes appear to be deeply dependent on their own FS - and their own undoubtedly quirky implementations. In addition, you haven't mentioned security. Unless you want to make every file world read/write with each OS, you will want to somehow synchronise the security apparatus (and it's reflection within the FS) in each OS ... yeah, that's going to happen.\u003c/p\u003e",
+            "raw_message": "Agreed, a NAS or fileshare of some-kind is the only answer. I would go further and say that any attempt to create a cross-platform FS that includes both Windows \u0026 OS X is futile. Both of these OSes appear to be deeply dependent on their own FS - and their own undoubtedly quirky implementations. In addition, you haven't mentioned security. Unless you want to make every file world read/write with each OS, you will want to somehow synchronise the security apparatus (and it's reflection within the FS) in each OS ... yeah, that's going to happen.",
+            "likes": 2,
+            "dislikes": 0,
+            "created_at": "2013-02-24T23:29:23",
+            "parent": 810433152,
+            "children": []
+          }
+        ]
+      },
+      "810435974": {
+        "id": 810435974,
+        "author_name": "Jan W",
+        "author_username": "disqus_crpSJEWZAE",
+        "author_location": "",
+        "message": "\u003cp\u003edo you have this cool thing called ethernet or wifi?\u003c/p\u003e\u003cp\u003ethere's these awesome things called network filesystems.  samba nfs and glusterfs are some of them.\u003c/p\u003e\u003cp\u003ecross platform application-layer is hard.  cross platform driver layer even harder.\u003c/p\u003e\u003cp\u003ekeeping one raid box with samba installed is peanuts in comparison, and probably the reason why there is no \"cross platform filesystems.\"\u003c/p\u003e",
+        "raw_message": "do you have this cool thing called ethernet or wifi?\n\n\nthere's these awesome things called network filesystems.  samba nfs and glusterfs are some of them.\n\n\ncross platform application-layer is hard.  cross platform driver layer even harder.\n\n\nkeeping one raid box with samba installed is peanuts in comparison, and probably the reason why there is no \"cross platform filesystems.\"",
+        "likes": 9,
+        "dislikes": 0,
+        "created_at": "2013-02-24T07:00:27",
+        "parent": -1,
+        "children": [
+          {
+            "id": 810440514,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYou do have a point, I actually completely forgot about just doing a NAS box. Mostly because I have a Linkstation NAS with raid 5 and performance of transferring to and from the box is kinda messy. It might be just the box itself, and not anything else, since I do have a Gigabit network.\u003c/p\u003e\u003cp\u003eI'll see if I can figure something up, or gather up a bunch of drives in an HTPC case with a basic board to act as a NAS.\u003c/p\u003e",
+            "raw_message": "You do have a point, I actually completely forgot about just doing a NAS box. Mostly because I have a Linkstation NAS with raid 5 and performance of transferring to and from the box is kinda messy. It might be just the box itself, and not anything else, since I do have a Gigabit network.\n\nI'll see if I can figure something up, or gather up a bunch of drives in an HTPC case with a basic board to act as a NAS.",
+            "likes": 2,
+            "dislikes": 0,
+            "created_at": "2013-02-24T07:08:36",
+            "parent": 810435974,
+            "children": [
+              {
+                "id": 810450892,
+                "author_name": "Jan W",
+                "author_username": "disqus_crpSJEWZAE",
+                "author_location": "",
+                "message": "\u003cp\u003eYea those consumer nas boxes can be really untuned out of the box.  Fiddling with smb.conf and some of kernel ip stack can help with those constrained mips/whatever nas boxes.  A 10 year old pc with pci sata controller and gigE and a decent distro can compete with the write speeds of ridiculously expensive \"enterprise\" raid setups.\u003c/p\u003e",
+                "raw_message": "Yea those consumer nas boxes can be really untuned out of the box.  Fiddling with smb.conf and some of kernel ip stack can help with those constrained mips/whatever nas boxes.  A 10 year old pc with pci sata controller and gigE and a decent distro can compete with the write speeds of ridiculously expensive \"enterprise\" raid setups.",
+                "likes": 3,
+                "dislikes": 0,
+                "created_at": "2013-02-24T07:27:02",
+                "parent": 810440514,
+                "children": []
+              },
+              {
+                "id": 811758921,
+                "author_name": "Dominic Amann",
+                "author_username": "dominicamann",
+                "author_location": "Hamilton, ON",
+                "message": "\u003cp\u003eI use an old box as a NAS (with 4 large sata drives as Raid 5), but I make sure I have both nfs and smb working (sharing the same stuff) as I prefer to have full *nix semantics where I can, and the smb as a fallback for (dumb) windows clients.\u003c/p\u003e",
+                "raw_message": "I use an old box as a NAS (with 4 large sata drives as Raid 5), but I make sure I have both nfs and smb working (sharing the same stuff) as I prefer to have full *nix semantics where I can, and the smb as a fallback for (dumb) windows clients.",
+                "likes": 1,
+                "dislikes": 0,
+                "created_at": "2013-02-25T15:30:09",
+                "parent": 810440514,
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      "810467989": {
+        "id": 810467989,
+        "author_name": "Mavroudis Varotsos",
+        "author_username": "disqus_fdrDPYsTcP",
+        "author_location": "",
+        "message": "\u003cp\u003e\"Linux doesn’t support writing on anything above 2.01. Maybe we should fix that.\"\u003c/p\u003e\u003cp\u003elack of modern UDF support in linux is a big hole that really ought to be filled. UDF has great potential; its an open standard already being supported by the big closed source OSs. \u003cbr\u003eI'm kind of surprised Linux is deficient in this way.\u003c/p\u003e\u003cp\u003e\u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fen.wikipedia.org%2Fwiki%2FUniversal_Disk_Format%3ANXbjFKWDoYGn9yUIa_dTSbG9YrU\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://en.wikipedia.org/wiki/Universal_Disk_Format\"\u003ehttp://en.wikipedia.org/wik...\u003c/a\u003e\u003c/p\u003e",
+        "raw_message": "\"Linux doesn’t support writing on anything above 2.01. Maybe we should fix that.\"\n\nlack of modern UDF support in linux is a big hole that really ought to be filled. UDF has great potential; its an open standard already being supported by the big closed source OSs. \nI'm kind of surprised Linux is deficient in this way.\n\nhttp://en.wikipedia.org/wiki/Universal_Disk_Format",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T07:57:58",
+        "parent": -1,
+        "children": []
+      },
+      "810483242": {
+        "id": 810483242,
+        "author_name": "Béranger",
+        "author_username": "disqus_i9VLycwBV0",
+        "author_location": "",
+        "message": "\u003cp\u003eEven now, in 2013, may favorite is JFS. And I still value XFS too. Speed matters to me. What I hate most in Linux that so many distros now almost exclusively support ext4 (which I consider to be shitty); of course, ext3 is mediocre, and ext2 is a joke. This is why I like JFS, no matter how old would it be... Oh, and, for the sake of a murderer, ReiserFS was a nice try, albeit with some visible drawbacks.\u003c/p\u003e",
+        "raw_message": "Even now, in 2013, may favorite is JFS. And I still value XFS too. Speed matters to me. What I hate most in Linux that so many distros now almost exclusively support ext4 (which I consider to be shitty); of course, ext3 is mediocre, and ext2 is a joke. This is why I like JFS, no matter how old would it be... Oh, and, for the sake of a murderer, ReiserFS was a nice try, albeit with some visible drawbacks.",
+        "likes": 2,
+        "dislikes": 0,
+        "created_at": "2013-02-24T08:24:53",
+        "parent": -1,
+        "children": [
+          {
+            "id": 810939326,
+            "author_name": "Kristleifur Daðason",
+            "author_username": "disqus_6QnZ51PTvs",
+            "author_location": "",
+            "message": "\u003cp\u003eJFS is great.\u003c/p\u003e",
+            "raw_message": "JFS is great.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-24T19:49:49",
+            "parent": 810483242,
+            "children": []
+          }
+        ]
+      },
+      "810493467": {
+        "id": 810493467,
+        "author_name": "inopinatus",
+        "author_username": "inopinatus",
+        "author_location": "Melbourne, Australia",
+        "message": "\u003cp\u003eParagon have everything you want but the article seems to dismiss them out of hand for being non-free. Also, they don't seem to be FUSE-based as claimed. My experience with their stuff has been that it's fast and reliable.\u003c/p\u003e",
+        "raw_message": "Paragon have everything you want but the article seems to dismiss them out of hand for being non-free. Also, they don't seem to be FUSE-based as claimed. My experience with their stuff has been that it's fast and reliable.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T08:42:45",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812320796,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eI dismissed it because of my experiences with Tuxera NTFS on OSX. Though I am starting to learn that Paragon has its own Kernel level driver system, which could potentially be really good. So I might try it.\u003c/p\u003e",
+            "raw_message": "I dismissed it because of my experiences with Tuxera NTFS on OSX. Though I am starting to learn that Paragon has its own Kernel level driver system, which could potentially be really good. So I might try it.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:13:18",
+            "parent": 810493467,
+            "children": []
+          }
+        ]
+      },
+      "810581918": {
+        "id": 810581918,
+        "author_name": "Hoang Xuan Phu",
+        "author_username": "phunehehe",
+        "author_location": "",
+        "message": "\u003cp\u003eThe main blocker for UDF is that it requires a full drive (not just a partition). I'm still waiting for a chance to cleanup my external hard drive and try it out.\u003c/p\u003e",
+        "raw_message": "The main blocker for UDF is that it requires a full drive (not just a partition). I'm still waiting for a chance to cleanup my external hard drive and try it out.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T11:09:29",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812320974,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYa, that is a blocker. I wish I could implant it into a partition table. and have it arbitrary size.\u003c/p\u003e",
+            "raw_message": "Ya, that is a blocker. I wish I could implant it into a partition table. and have it arbitrary size.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:13:41",
+            "parent": 810581918,
+            "children": [
+              {
+                "id": 859760189,
+                "author_name": "Tom Maneiro",
+                "author_username": "tomman",
+                "author_location": "El Tigre, Soviet Venezuela",
+                "message": "\u003cp\u003eUDF *doesn't* require a full drive on HDDs, only on pendrives (and this \"restriction\" only applies to Windows).\u003c/p\u003e\u003cp\u003eOn standard removable devices you can get away with a single-partition or a full-drive FS (since Windows will not recognize beyond the first partition on these due to some really dumb artificial restriction imposed by MS - a \"workaround\" is to use GPT + Paragon GPT Loader... but this most likely will cause problems on anything post-XP). But on anything that identifies itself as an run-off-the-mill HDD, you NEED to have partitions.\u003c/p\u003e\u003cp\u003eThe major problem with UDF is that it doesn't have a official partition ID (neither under MBR nor on GPT). But Microsoft \"recommends\" using 0x06 (VFAT) / 0x07 (NTFS) on MBR, and Microsoft Basic Data Partition on GPT. Any of these will allow your UDF partition to be recognized and mounted under XP/Vista/7/8.\u003c/p\u003e\u003cp\u003eLinux will accept anything that you throw at it (flat devices, MBRs, GPTs...), as it should be. Not sure about OSX since I don't deal with Macs.\u003c/p\u003e",
+                "raw_message": "UDF *doesn't* require a full drive on HDDs, only on pendrives (and this \"restriction\" only applies to Windows).\n\nOn standard removable devices you can get away with a single-partition or a full-drive FS (since Windows will not recognize beyond the first partition on these due to some really dumb artificial restriction imposed by MS - a \"workaround\" is to use GPT + Paragon GPT Loader... but this most likely will cause problems on anything post-XP). But on anything that identifies itself as an run-off-the-mill HDD, you NEED to have partitions.\n\nThe major problem with UDF is that it doesn't have a official partition ID (neither under MBR nor on GPT). But Microsoft \"recommends\" using 0x06 (VFAT) / 0x07 (NTFS) on MBR, and Microsoft Basic Data Partition on GPT. Any of these will allow your UDF partition to be recognized and mounted under XP/Vista/7/8.\n\nLinux will accept anything that you throw at it (flat devices, MBRs, GPTs...), as it should be. Not sure about OSX since I don't deal with Macs.",
+                "likes": 0,
+                "dislikes": 0,
+                "created_at": "2013-04-11T15:26:53",
+                "parent": 812320974,
+                "children": [
+                  {
+                    "id": 889020029,
+                    "author_name": "Hoang Xuan Phu",
+                    "author_username": "phunehehe",
+                    "author_location": "",
+                    "message": "\u003cp\u003eWow really? I'll have to give it another try then.\u003c/p\u003e",
+                    "raw_message": "Wow really? I'll have to give it another try then.",
+                    "likes": 0,
+                    "dislikes": 0,
+                    "created_at": "2013-05-08T04:43:52",
+                    "parent": 859760189,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "810597913": {
+        "id": 810597913,
+        "author_name": "mrbngle",
+        "author_username": "mrbngle",
+        "author_location": "",
+        "message": "\u003cp\u003eF2FS looks like a good candidate to replace FAT32.\u003c/p\u003e",
+        "raw_message": "F2FS looks like a good candidate to replace FAT32.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T11:34:07",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812321242,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYa, but for now its Linux Only. Looking forward to it though.\u003c/p\u003e",
+            "raw_message": "Ya, but for now its Linux Only. Looking forward to it though.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:14:16",
+            "parent": 810597913,
+            "children": []
+          }
+        ]
+      },
+      "810613249": {
+        "id": 810613249,
+        "author_name": "Ralph Corderoy",
+        "author_username": "ralph",
+        "author_location": "",
+        "message": "\u003cp\u003eI've wondered this too but from a slightly different angle.  I was after a filesystem format that has high limitations, e.g. filesystem size and file length, but a very simple layout and structure so that a driver for it is simple and can be ported widely including, for example, to small embedded environments, even if read-only there.  To be cross-platform, I assumed native attributes would have to be as meta-data tags on a file.  The simplicity would hit performance, e.g. files can't be fragmented, but then ease of implementation is valued over performance.\u003c/p\u003e\u003cp\u003eFor your needs, plain UDF was the best hope I found.  Does it matter Linux doesn't do beyond 2.01?\u003c/p\u003e",
+        "raw_message": "I've wondered this too but from a slightly different angle.  I was after a filesystem format that has high limitations, e.g. filesystem size and file length, but a very simple layout and structure so that a driver for it is simple and can be ported widely including, for example, to small embedded environments, even if read-only there.  To be cross-platform, I assumed native attributes would have to be as meta-data tags on a file.  The simplicity would hit performance, e.g. files can't be fragmented, but then ease of implementation is valued over performance.\n\n\nFor your needs, plain UDF was the best hope I found.  Does it matter Linux doesn't do beyond 2.01?",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T11:57:54",
+        "parent": -1,
+        "children": [
+          {
+            "id": 857821754,
+            "author_name": "Todd Russell",
+            "author_username": "disqus_mnAV7mNa7X",
+            "author_location": "",
+            "message": "\u003cp\u003eBeware UDF if you are using Macs. I decided to give it a whirl, and it has worked great with Linux and Windows 7, but it has kernel panicked 2 different Macs on 2 different versions of the OS (10.5 and 10.7) when trying to umount and remove the drive. That put a quick end to my experiment, despite it looking very hopeful in the beginning. Back to the drawing board....  :/\u003c/p\u003e",
+            "raw_message": "Beware UDF if you are using Macs. I decided to give it a whirl, and it has worked great with Linux and Windows 7, but it has kernel panicked 2 different Macs on 2 different versions of the OS (10.5 and 10.7) when trying to umount and remove the drive. That put a quick end to my experiment, despite it looking very hopeful in the beginning. Back to the drawing board....  :/",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-04-09T18:29:34",
+            "parent": 810613249,
+            "children": []
+          },
+          {
+            "id": 812321979,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYa, i was reading over the 2.5 and 2.6 changes, and they don't affect hard drive use in any way. I just dont think the UDF problems with Windows would be worth dealing. Cause Windows could potentially make it read only, and I would have to go fix it in Linux every time.\u003c/p\u003e",
+            "raw_message": "Ya, i was reading over the 2.5 and 2.6 changes, and they don't affect hard drive use in any way. I just dont think the UDF problems with Windows would be worth dealing. Cause Windows could potentially make it read only, and I would have to go fix it in Linux every time.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:15:28",
+            "parent": 810613249,
+            "children": []
+          }
+        ]
+      },
+      "810679220": {
+        "id": 810679220,
+        "author_name": "sjoervanderploeg",
+        "author_username": "sjoervanderploeg",
+        "author_location": "",
+        "message": "\u003cp\u003e Why go trough the hassle of multiboot setups just for development environments?\u003c/p\u003e\u003cp\u003eYou could just use one host with two VM's, if you are using multiple monitors just dedicate one monitor to a VM. You  can even hook up an extra mouse and keyboard for the VM. On the host you can host a Samba share to share files between the machines.\u003c/p\u003e\u003cp\u003eIf  you need better disk performance from the VM, just use physical disks. When you are using physical disks you can even boot them natively when needed (if needed at all).\u003c/p\u003e",
+        "raw_message": " Why go trough the hassle of multiboot setups just for development environments?\n\nYou could just use one host with two VM's, if you are using multiple monitors just dedicate one monitor to a VM. You  can even hook up an extra mouse and keyboard for the VM. On the host you can host a Samba share to share files between the machines.\n\nIf  you need better disk performance from the VM, just use physical disks. When you are using physical disks you can even boot them natively when needed (if needed at all).",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-24T14:00:38",
+        "parent": -1,
+        "children": [
+          {
+            "id": 810944882,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eBecause running Mobile VMs inside the VMs is slow as hell. I do all kinds of development, including mobile. Having a Simulator running in a VM is like banging your head on the edges of a brick.\u003c/p\u003e",
+            "raw_message": "Because running Mobile VMs inside the VMs is slow as hell. I do all kinds of development, including mobile. Having a Simulator running in a VM is like banging your head on the edges of a brick.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-24T19:55:19",
+            "parent": 810679220,
+            "children": [
+              {
+                "id": 810994917,
+                "author_name": "disordinary",
+                "author_username": "ryan_mccarvill",
+                "author_location": "Wellington, NZ",
+                "message": "\u003cp\u003eYou can have the best of both worlds, I work in Fedora mostly but have a Windows 8 partition that I can boot to, I have it configured so that I have VMWare workstation on both VM's and can boot the other partition via vmware if I want access to files (easy through shared folders). So I have the choice to boot natively or boot that partition as a VM if I want to get access to it or work in it without restarting. Maybe not too elegant but it works.\u003c/p\u003e",
+                "raw_message": "You can have the best of both worlds, I work in Fedora mostly but have a Windows 8 partition that I can boot to, I have it configured so that I have VMWare workstation on both VM's and can boot the other partition via vmware if I want access to files (easy through shared folders). So I have the choice to boot natively or boot that partition as a VM if I want to get access to it or work in it without restarting. Maybe not too elegant but it works.",
+                "likes": 0,
+                "dislikes": 0,
+                "created_at": "2013-02-24T20:52:10",
+                "parent": 810944882,
+                "children": [
+                  {
+                    "id": 812385097,
+                    "author_name": "Milind R",
+                    "author_username": "disqus_JelLu6NBiW",
+                    "author_location": "",
+                    "message": "\u003cp\u003eHow did you do that? Can you point me to some article or something? I'd love to have the choice of booting either natively or through VM.\u003c/p\u003e",
+                    "raw_message": "How did you do that? Can you point me to some article or something? I'd love to have the choice of booting either natively or through VM.",
+                    "likes": 0,
+                    "dislikes": 0,
+                    "created_at": "2013-02-26T03:34:16",
+                    "parent": 810994917,
+                    "children": []
+                  },
+                  {
+                    "id": 816309722,
+                    "author_name": "irneb",
+                    "author_username": "irneb",
+                    "author_location": "",
+                    "message": "\u003cp\u003eI'd also like to know how you did this. I've been able to do that through VBox for Linux only.\u003cbr\u003e\u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fthefrozenfire.com%2F2010%2F11%2Fboot-your-real-os-from-virtualbox%2F%3AAgX9B2D3xbW5Ui0mNnyRFmZ2sg4\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://thefrozenfire.com/2010/11/boot-your-real-os-from-virtualbox/\"\u003ehttp://thefrozenfire.com/20...\u003c/a\u003e\u003c/p\u003e\u003cp\u003eWindows has issues since the raw-boot and the VM-boot uses different \"hardware\" and thus windows keeps complaining about new hardware found and needing to reboot several times. In one case it even lost its authorization due to such multi-hardware rebooting. Had to phone MS to get a new authorization code as the online auth didn't work anymore.\u003c/p\u003e",
+                    "raw_message": "I'd also like to know how you did this. I've been able to do that through VBox for Linux only.\nhttp://thefrozenfire.com/2010/11/boot-your-real-os-from-virtualbox/\n\nWindows has issues since the raw-boot and the VM-boot uses different \"hardware\" and thus windows keeps complaining about new hardware found and needing to reboot several times. In one case it even lost its authorization due to such multi-hardware rebooting. Had to phone MS to get a new authorization code as the online auth didn't work anymore.",
+                    "likes": 0,
+                    "dislikes": 0,
+                    "created_at": "2013-03-01T09:02:20",
+                    "parent": 810994917,
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "811039845": {
+        "id": 811039845,
+        "author_name": "technogeist",
+        "author_username": "disqus_xvedkMo0Em",
+        "author_location": "",
+        "message": "\u003cp\u003eSounds to me like a challenge for Open Source community.\u003c/p\u003e",
+        "raw_message": "Sounds to me like a challenge for Open Source community.",
+        "likes": 2,
+        "dislikes": 0,
+        "created_at": "2013-02-24T21:48:58",
+        "parent": -1,
+        "children": []
+      },
+      "811053364": {
+        "id": 811053364,
+        "author_name": "littleboot24",
+        "author_username": "littleboot24",
+        "author_location": "",
+        "message": "\u003cp\u003eUDF 2.01 is quite fine, it supports all the major features you need in a filesystem (unix permissions, hardlinks softlinks, metadata, \u0026gt;4GB files). Later revisions add features for optical media, which has no effect on the mode you use for random access devices. So it works quite well for USBs.\u003c/p\u003e\u003cp\u003eIf you want to format it correctly, you need to zero your device, that is \"dd if=/dev/zero of=/dev/device bs=512\". Most OSs use magic bits to determine filesystems, and when you format as UDF some old FAT bits aren't touched (the danger of quick formats). So if you don't do a zero, then some devices may get confused. Next you need to invoke it like this \"mkudffs --blocksize=512 --media-type=hd --utf8 --lvid=DriveLabel --vid=DriveLabel --fsid=DriveLabel /dev/device\" (you don't need a partition table, especially since there is no UDF partition id, which confuses some OSs). That blocksize is rather important. Also note that you *must* unmount properly, especially in Windows, otherwise you can lose write support on windows. You need to mount it on linux to have write access again (something wrong with Windows' implementation?).\u003c/p\u003e\u003cp\u003eNow I must admit I haven't gotten this to work in OSX, but that is more not having one then anything. I'm pretty sure OSX has its own cli tool to format devices as UDF, which may be compatible with other OSs, but I can't try it.\u003c/p\u003e",
+        "raw_message": "UDF 2.01 is quite fine, it supports all the major features you need in a filesystem (unix permissions, hardlinks softlinks, metadata, \u003e4GB files). Later revisions add features for optical media, which has no effect on the mode you use for random access devices. So it works quite well for USBs.\n\nIf you want to format it correctly, you need to zero your device, that is \"dd if=/dev/zero of=/dev/device bs=512\". Most OSs use magic bits to determine filesystems, and when you format as UDF some old FAT bits aren't touched (the danger of quick formats). So if you don't do a zero, then some devices may get confused. Next you need to invoke it like this \"mkudffs --blocksize=512 --media-type=hd --utf8 --lvid=DriveLabel --vid=DriveLabel --fsid=DriveLabel /dev/device\" (you don't need a partition table, especially since there is no UDF partition id, which confuses some OSs). That blocksize is rather important. Also note that you *must* unmount properly, especially in Windows, otherwise you can lose write support on windows. You need to mount it on linux to have write access again (something wrong with Windows' implementation?).\n\nNow I must admit I haven't gotten this to work in OSX, but that is more not having one then anything. I'm pretty sure OSX has its own cli tool to format devices as UDF, which may be compatible with other OSs, but I can't try it.",
+        "likes": 2,
+        "dislikes": 0,
+        "created_at": "2013-02-24T22:06:11",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812324043,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eOSX UDF support is pretty much straightforward like Linux, my only qualm is that Windows can potentially lock it if you dont remember to unmount it before reboot, but it might be a small price to pay to get what I am looking for.\u003c/p\u003e",
+            "raw_message": "OSX UDF support is pretty much straightforward like Linux, my only qualm is that Windows can potentially lock it if you dont remember to unmount it before reboot, but it might be a small price to pay to get what I am looking for.",
+            "likes": 1,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:19:29",
+            "parent": 811053364,
+            "children": []
+          }
+        ]
+      },
+      "811475178": {
+        "id": 811475178,
+        "author_name": "irneb",
+        "author_username": "irneb",
+        "author_location": "",
+        "message": "\u003cp\u003eNot exactly correct about HFS only having R/O access. There are stuff like MacDrive which do allow write access to HFS from a windows OS: \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.macwindows.com%2Fdisks2.html%3AnLTnzpCf1hrdOh4S7B-2NhJpVIc\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.macwindows.com/disks2.html\"\u003ehttp://www.macwindows.com/d...\u003c/a\u003e\u003c/p\u003e\u003cp\u003eAs for UDF, I've had nothing but issues using it. Mostly corruption of data, but also slow performance on some systems.\u003c/p\u003e\u003cp\u003eAlternatively, the VM idea could be used to \"build your own NAS inside your PC\". I.e. run some minimalist OS \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fdoc.freenas.org%2Findex.php%2FFreeNAS%25C2%25AE_in_a_Virtual_Environment%3ARFE6jHiMjDqQDgXhKUTZve3iHyk\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://doc.freenas.org/index.php/FreeNAS%C2%AE_in_a_Virtual_Environment\"\u003ehttp://doc.freenas.org/inde...\u003c/a\u003e in a VM, then share a folder with the host OS. That way your Win/Mac could link to the Ext4/JFS/ZFS/etc. Linux file system of your choice, without needing any \"drivers\". That way the VM is simply your \"driver\" to the Linux FS, your host would still have decent performance for whatever else you have running on it. Also the connection speed is in essence even faster than 1G LAN connected NAS. Of course this is not a very simple thing to achieve - you'd need to map some physical discs / partitions onto the VM and link to it through a bridge-LAN, and your bootup virtual disc needs to be placed on something like a FAT32 (else your hosts can't get to it). But if performance and robustness is your goal, this is your best bet.\u003c/p\u003e\u003cp\u003eYou're correct about the commercial NAS boxes being less than optimal. In my own experience I tend to get much better performance by simply default installing a FreeNAS onto an old PC than any commercial NAS I've tried. Never mind tweaking it to get even better performance. But you're still limited to the LAN speed and/or USB2 - why are there so few NASes with USB3 and 1GB LAN?\u003c/p\u003e",
+        "raw_message": "Not exactly correct about HFS only having R/O access. There are stuff like MacDrive which do allow write access to HFS from a windows OS: http://www.macwindows.com/disks2.html\n\n\nAs for UDF, I've had nothing but issues using it. Mostly corruption of data, but also slow performance on some systems.\n\nAlternatively, the VM idea could be used to \"build your own NAS inside your PC\". I.e. run some minimalist OS http://doc.freenas.org/index.php/FreeNAS%C2%AE_in_a_Virtual_Environment in a VM, then share a folder with the host OS. That way your Win/Mac could link to the Ext4/JFS/ZFS/etc. Linux file system of your choice, without needing any \"drivers\". That way the VM is simply your \"driver\" to the Linux FS, your host would still have decent performance for whatever else you have running on it. Also the connection speed is in essence even faster than 1G LAN connected NAS. Of course this is not a very simple thing to achieve - you'd need to map some physical discs / partitions onto the VM and link to it through a bridge-LAN, and your bootup virtual disc needs to be placed on something like a FAT32 (else your hosts can't get to it). But if performance and robustness is your goal, this is your best bet.\n\nYou're correct about the commercial NAS boxes being less than optimal. In my own experience I tend to get much better performance by simply default installing a FreeNAS onto an old PC than any commercial NAS I've tried. Never mind tweaking it to get even better performance. But you're still limited to the LAN speed and/or USB2 - why are there so few NASes with USB3 and 1GB LAN?",
+        "likes": 3,
+        "dislikes": 0,
+        "created_at": "2013-02-25T08:46:26",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812323044,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eAgreed, and I am looking into the many NAS solutions people suggest. Just my experience with my Linkstation Quad has been kind of rough. Even though it has 1GB lan, its disk performance is attrocious.\u003c/p\u003e",
+            "raw_message": "Agreed, and I am looking into the many NAS solutions people suggest. Just my experience with my Linkstation Quad has been kind of rough. Even though it has 1GB lan, its disk performance is attrocious.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:17:33",
+            "parent": 811475178,
+            "children": [
+              {
+                "id": 813272095,
+                "author_name": "irneb",
+                "author_username": "irneb",
+                "author_location": "",
+                "message": "\u003cp\u003eYep, you'll find that most (if not all) NAS boxes use the very least (and cheapest) hardware possible. Stuff like Atom CPU's are common place even on mid-range NASes. Then they'd also have extremely cut down motherboards, usually not even a SATA3 connection for the HDD/SSD. Then they usually have some Linux / BSD default installed with a bit of web-page front end of their own - for configuration. But usually they're not even software optimized. So I'd not expect too much from them. It's only in more \"industrial\" NASes where you could get some decent performance - especially with multiple users, but then your cost is going to sky-rocket. On the low-end scale (mine's an Iomega iConnect, so only allows 4x USB2 discs running on an Iomega branded Debian) I've seen max throughput of around 10MB/s (avg 6MB/s) - and if I plug that USB disc directly into a USB2 port I get around 35MB/s, so it's not the disc - it's the silly slow NAS. With that same disc in a USB3 port I get around 50-70 MB/s, so if the NAS had some decent hardware it \"might\" have performed adequately.\u003c/p\u003e\u003cp\u003eThat's why I'm suggesting installing a FreeNAS as a Virtual Machine on Windows / Mac. That way you get the same performance as your own PC gives. A bit convoluted for sure, but at least it's a lot less time wastage than searching for drivers which may exist but only in beta form at best. I've just tried it for myself again, just to see how \"difficult\" / time consuming this idea is. Downloaded the newest FreeNAS iso, created a new VM in VirtualBox doing that exact same procedure as stipulated in the 2nd link in my previous post. Took me all of 30 min to setup to get a share working in Windows to a ZFS disc. Permissions was the biggest issue which needed some setting changes to the cifs share. Then another 1 min to setup a shortcut in the Startup menu to load that VM as a headless guest so it's available as soon as I login without me needing to click anything. Then I tested throughput using around 5GB of files to copy onto it, went at 65 MB/s, and copying off was 58MB/s - a LOT faster than the \"commercial\" NAS - and that's without me even trying to optimize the thing and only working through the VBox's virtual disc (which obviously slows things down as well, a RAW disc would perform at near max speed). If you don't like Oracle, then VMWare is also capable of doing the same, apparently - though I've not done it using VMWare.\u003c/p\u003e\u003cp\u003eUnfortunately FreeNAS only gives UFS/ZFS as file system for new blank discs, but most Linuxes could mount those natively. Or you could install another Linux and simply share from that if you really want to use something like ext4, but then the pre-setup might be a bit more geeky.\u003c/p\u003e\u003cp\u003eWhat I haven't done yet - which would be a definite MUST in your case would be to link a physical disc into that VM (i.e. RAW disc / partition). But that's quite possible through some cli: \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.virtualbox.org%2Fmanual%2Fch09.html%23rawdisk%3Av_FctMWMq_kzwIA86gFz7cUJ0io\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.virtualbox.org/manual/ch09.html#rawdisk\"\u003ehttp://www.virtualbox.org/m...\u003c/a\u003e\u003c/p\u003e\u003cp\u003eOne thing to remember though: your VDI files (i.e. the virtual discs) need to be on a FAT32 disc/partition so all your OSs can get to them easily. Fortunately FreeNAS needs only 4GB for its install disc - so the VDI would work on the FAT32.\u003c/p\u003e",
+                "raw_message": "Yep, you'll find that most (if not all) NAS boxes use the very least (and cheapest) hardware possible. Stuff like Atom CPU's are common place even on mid-range NASes. Then they'd also have extremely cut down motherboards, usually not even a SATA3 connection for the HDD/SSD. Then they usually have some Linux / BSD default installed with a bit of web-page front end of their own - for configuration. But usually they're not even software optimized. So I'd not expect too much from them. It's only in more \"industrial\" NASes where you could get some decent performance - especially with multiple users, but then your cost is going to sky-rocket. On the low-end scale (mine's an Iomega iConnect, so only allows 4x USB2 discs running on an Iomega branded Debian) I've seen max throughput of around 10MB/s (avg 6MB/s) - and if I plug that USB disc directly into a USB2 port I get around 35MB/s, so it's not the disc - it's the silly slow NAS. With that same disc in a USB3 port I get around 50-70 MB/s, so if the NAS had some decent hardware it \"might\" have performed adequately.\n\nThat's why I'm suggesting installing a FreeNAS as a Virtual Machine on Windows / Mac. That way you get the same performance as your own PC gives. A bit convoluted for sure, but at least it's a lot less time wastage than searching for drivers which may exist but only in beta form at best. I've just tried it for myself again, just to see how \"difficult\" / time consuming this idea is. Downloaded the newest FreeNAS iso, created a new VM in VirtualBox doing that exact same procedure as stipulated in the 2nd link in my previous post. Took me all of 30 min to setup to get a share working in Windows to a ZFS disc. Permissions was the biggest issue which needed some setting changes to the cifs share. Then another 1 min to setup a shortcut in the Startup menu to load that VM as a headless guest so it's available as soon as I login without me needing to click anything. Then I tested throughput using around 5GB of files to copy onto it, went at 65 MB/s, and copying off was 58MB/s - a LOT faster than the \"commercial\" NAS - and that's without me even trying to optimize the thing and only working through the VBox's virtual disc (which obviously slows things down as well, a RAW disc would perform at near max speed). If you don't like Oracle, then VMWare is also capable of doing the same, apparently - though I've not done it using VMWare.\n\nUnfortunately FreeNAS only gives UFS/ZFS as file system for new blank discs, but most Linuxes could mount those natively. Or you could install another Linux and simply share from that if you really want to use something like ext4, but then the pre-setup might be a bit more geeky.\n\nWhat I haven't done yet - which would be a definite MUST in your case would be to link a physical disc into that VM (i.e. RAW disc / partition). But that's quite possible through some cli: http://www.virtualbox.org/manual/ch09.html#rawdisk\n\nOne thing to remember though: your VDI files (i.e. the virtual discs) need to be on a FAT32 disc/partition so all your OSs can get to them easily. Fortunately FreeNAS needs only 4GB for its install disc - so the VDI would work on the FAT32.",
+                "likes": 1,
+                "dislikes": 0,
+                "created_at": "2013-02-26T20:39:30",
+                "parent": 812323044,
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      "811614588": {
+        "id": 811614588,
+        "author_name": "jwn0001",
+        "author_username": "jwn0001",
+        "author_location": "",
+        "message": "\u003cp\u003eEveryone with their head in the clouds apparently got a big surprise this weekend (ala microsoft certificates) and no access.\u003c/p\u003e\u003cp\u003e\"Cloud\" !=  \"Mission Critical Data\" || apps || Personal Info || Transactions\u003c/p\u003e\u003cp\u003eYou can blame Microsoft for the fact that \"app / data serving\" is not more mainstream (they needed the one install per machine of office to retain their reign of terror.  Same with the file system.\u003c/p\u003e\u003cp\u003eServing in one form or another has been the \"answer\" to cross platform since the late 1980's.\u003c/p\u003e",
+        "raw_message": "Everyone with their head in the clouds apparently got a big surprise this weekend (ala microsoft certificates) and no access.\n\n\"Cloud\" !=  \"Mission Critical Data\" || apps || Personal Info || Transactions\n\nYou can blame Microsoft for the fact that \"app / data serving\" is not more mainstream (they needed the one install per machine of office to retain their reign of terror.  Same with the file system.\n\nServing in one form or another has been the \"answer\" to cross platform since the late 1980's.",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-25T12:44:49",
+        "parent": -1,
+        "children": []
+      },
+      "811741763": {
+        "id": 811741763,
+        "author_name": "lsatenstein",
+        "author_username": "lsatenstein",
+        "author_location": "",
+        "message": "\u003cp\u003eYou omitted zfs­, used and promoted by Oracle.  It appears to be more performing again, than btfrs. (Perhaps zfs is based on the bplus tree algorithm.)\u003c/p\u003e",
+        "raw_message": "You omitted zfs­, used and promoted by Oracle.  It appears to be more performing again, than btfrs. (Perhaps zfs is based on the bplus tree algorithm.)",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-25T15:15:23",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812320386,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eI lumped ZFS into the \"Many on linux\" category because zfs does not have Windows drivers or support.\u003c/p\u003e",
+            "raw_message": "I lumped ZFS into the \"Many on linux\" category because zfs does not have Windows drivers or support.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:12:28",
+            "parent": 811741763,
+            "children": []
+          }
+        ]
+      },
+      "812257679": {
+        "id": 812257679,
+        "author_name": "Scott Edmondson",
+        "author_username": "scottedmondson",
+        "author_location": "",
+        "message": "\u003cp\u003eWhat did you do to get OSX running on a PC Desktop? Is it multi-boot or is OSX running in a VM of some kind?\u003c/p\u003e\u003cp\u003eI develop for Windows running Windows in a VM on a Linux box. I'd love to get OSX running in a VM.\u003c/p\u003e\u003cp\u003eCheers,\u003cbr\u003eScott\u003c/p\u003e",
+        "raw_message": "What did you do to get OSX running on a PC Desktop? Is it multi-boot or is OSX running in a VM of some kind?\n\n\nI develop for Windows running Windows in a VM on a Linux box. I'd love to get OSX running in a VM.\n\nCheers,\nScott",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-26T01:05:10",
+        "parent": -1,
+        "children": [
+          {
+            "id": 813314944,
+            "author_name": "irneb",
+            "author_username": "irneb",
+            "author_location": "",
+            "message": "\u003cp\u003eI've not tried a multi-boot OSX before. But I've been able to install Mountain Lion through VBox: \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.macbreaker.com%2F2012%2F07%2Fmountain-lion-virtualbox.html%3ANx7DQuIYvP6zSr6gRAih_JZt_Fg\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.macbreaker.com/2012/07/mountain-lion-virtualbox.html\"\u003ehttp://www.macbreaker.com/2...\u003c/a\u003e\u003c/p\u003e",
+            "raw_message": "I've not tried a multi-boot OSX before. But I've been able to install Mountain Lion through VBox: http://www.macbreaker.com/2012/07/mountain-lion-virtualbox.html",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T21:13:46",
+            "parent": 812257679,
+            "children": []
+          },
+          {
+            "id": 812320032,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eI was multi-boot. OSX is running directly on my hardware. Its called a Hackintosh, plenty of resources only on how to do it. \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fosx86.net%2F%3AMv6UlP2nikcSs1-bvX7dqAstVZY\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://osx86.net/\"\u003ehttp://osx86.net/\u003c/a\u003e is one, \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.insanelymac.com%2F%3AzQZ9sP99DF9iOhnD4xNA4xW3yGo\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.insanelymac.com/\"\u003ehttp://www.insanelymac.com/\u003c/a\u003e is a major one, and \u003ca href=\"http://disq.us/url?url=http%3A%2F%2Fwww.osx86project.org%2F%3AwGnQD7JS_2nc-1iIkstgJdV5kkw\u0026amp;cuid=1832027\" rel=\"nofollow noopener\" target=\"_blank\" title=\"http://www.osx86project.org/\"\u003ehttp://www.osx86project.org/\u003c/a\u003e is good too. Plenty of resources, but requires compatible hardware, which I happened to have already.\u003c/p\u003e",
+            "raw_message": "I was multi-boot. OSX is running directly on my hardware. Its called a Hackintosh, plenty of resources only on how to do it. http://osx86.net/ is one, http://www.insanelymac.com/ is a major one, and http://www.osx86project.org/ is good too. Plenty of resources, but requires compatible hardware, which I happened to have already.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:11:46",
+            "parent": 812257679,
+            "children": []
+          }
+        ]
+      },
+      "812285504": {
+        "id": 812285504,
+        "author_name": "Guest",
+        "author_username": "",
+        "author_location": "",
+        "message": "",
+        "raw_message": "",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-26T01:31:49",
+        "parent": -1,
+        "children": [
+          {
+            "id": 812323584,
+            "author_name": "Yulian Kuncheff",
+            "author_username": "Daegalus",
+            "author_location": "Berkeley, CA",
+            "message": "\u003cp\u003eYes, I might look into a good NAS setup, my current one is pretty bad, so it is why I dismissed it outright.\u003c/p\u003e",
+            "raw_message": "Yes, I might look into a good NAS setup, my current one is pretty bad, so it is why I dismissed it outright.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-02-26T02:18:36",
+            "parent": 812285504,
+            "children": []
+          }
+        ]
+      },
+      "813908839": {
+        "id": 813908839,
+        "author_name": "Nathaniel Ng",
+        "author_username": "nathaniel_ng",
+        "author_location": "Singapore",
+        "message": "\u003cp\u003eI use Dropbox + rsync for my needs. Dropbox can sometimes be a little slow, though. rsync is pretty fast (copying files within the same computer). Alternatively, I'd set up a NAS server on the Linux box and access that from Win/Mac. On thumbdrives, I have little choice except to stick with FAT32 (where my biggest issue is usually permissions).\u003c/p\u003e",
+        "raw_message": "I use Dropbox + rsync for my needs. Dropbox can sometimes be a little slow, though. rsync is pretty fast (copying files within the same computer). Alternatively, I'd set up a NAS server on the Linux box and access that from Win/Mac. On thumbdrives, I have little choice except to stick with FAT32 (where my biggest issue is usually permissions).",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-02-27T08:17:15",
+        "parent": -1,
+        "children": []
+      },
+      "818298392": {
+        "id": 818298392,
+        "author_name": "serverhorror",
+        "author_username": "serverhorror",
+        "author_location": "",
+        "message": "\u003cp\u003eAs others said: Use network storage.\u003c/p\u003e\u003cp\u003eIf you want the same pain from network as you get from local storage you can always use ISCSI and format that with the filesystem of your least disliking.\u003c/p\u003e\u003cp\u003eFor a \"turn key solution\" what about one of those services that synchronise a local folder with a remote service (yup that might be costly) -- I heard Dropbox is popular :)\u003c/p\u003e",
+        "raw_message": "As others said: Use network storage.\n\nIf you want the same pain from network as you get from local storage you can always use ISCSI and format that with the filesystem of your least disliking.\n\nFor a \"turn key solution\" what about one of those services that synchronise a local folder with a remote service (yup that might be costly) -- I heard Dropbox is popular :)",
+        "likes": 0,
+        "dislikes": 0,
+        "created_at": "2013-03-03T19:19:24",
+        "parent": -1,
+        "children": [
+          {
+            "id": 818766933,
+            "author_name": "irneb",
+            "author_username": "irneb",
+            "author_location": "",
+            "message": "\u003cp\u003eI don't think costly is the right adjective for the DropBox idea. Slow might be closer to the truth. As per the discussions about NAS, I don't think DropBox would be faster than even the slowest NAS available.\u003c/p\u003e",
+            "raw_message": "I don't think costly is the right adjective for the DropBox idea. Slow might be closer to the truth. As per the discussions about NAS, I don't think DropBox would be faster than even the slowest NAS available.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-03-04T11:25:49",
+            "parent": 818298392,
+            "children": []
+          }
+        ]
+      },
+      "858949007": {
+        "id": 858949007,
+        "author_name": "Tom Maneiro",
+        "author_username": "tomman",
+        "author_location": "El Tigre, Soviet Venezuela",
+        "message": "\u003cp\u003eI was on the same situation - just upgraded to Windows 7, and got a 2TB external HDD. However, OSX isn't on my list of requirements. Did my experiments:\u003c/p\u003e\u003cp\u003e- FAT32: No way in hell. Once you add DVD9 ISOs and VM images, it quickly loses. Plus it has no POSIX permissions, no symlinks, heavy fragmentation... Just say NO.\u003c/p\u003e\u003cp\u003e- ext3: There are a couple of very good drivers for Windows, Ext2IFS and ext2fsd. Sure, you lose journaling, but still, both are very solid drivers that I had been using for ages in XP (good performance, rock-solid stability). Unfortunately, UAC ruins the party here: you lose the ability to run executables under Vista/7/8 (regular EXEs will work, but anything that requires elevation or admin privilegies -like installers, for example- will FAIL with a obscure error message related to network paths). No fix (except for disabling UAC which is a big NO-NO) because this behaviour is intentional by MS unless you stick to FAT/NTFS/UDF.\u003c/p\u003e\u003cp\u003e- UDF: Works wonders for small volumes. You lose XP write compatibility (only one driver was ever developed with write support for HDDs, SAI' WriteUDF! - it costs $89, and the company is now defunct, so if you still care about XP, better bite the bullet and buy a new PC). Unfortunately for large volumes (like my 2TB external), no filesystem check tool in this world will recognize it (tried with chkdsk and Solaris/OpenIndiana UDF fsck: both complain about the device having no filesystem). And no fsck under Linux means that if you care about data integrity you should not be using UDF. Oh, if your volume gets flagged as dirty, \u003ci\u003eunfortunately Linux won't \"unlock\" it for Windows, only chkdsk will do\u003c/i\u003e... and it also means that since chkdsk won't deal with such large volumes (\u0026gt;1TB?), your FS ends tied to Linux anyway. Close, but no cigar. But for small devices (pendrives?), it's the way to go as long as you don't need XP write access.\u003c/p\u003e\u003cp\u003e- NTFS: Sure, write performance sucks for native SATA drive/controller pairs. But on USB-attached drives it doesn't matter at all which FS you do pick - write performance is pretty much equal between NTFS, ext3 and UDF (albeit CPU usage is MUCH higher with NTFS when combined with the highly-CPU-bound USB interface). Symlinks come for free if you're using Vista or later. UNIX/POSIX file permissions require a user mapping file for ntfs-3g, after adding it, it works pretty much as expected. Limited error checking support under Linux, but for mutliboot scenarios, it doesn't matter that much anyway as long as one OS agrees to check and fix your FS.\u003c/p\u003e\u003cp\u003e- exFAT: Is this a bad joke!?!??! Patent minefield, sucky drivers outside Windozeland, hyperpropietary specs... \u003cb\u003eNO.\u003c/b\u003e\u003c/p\u003e\u003cp\u003eAs usual, Microsoft is ruining the party. But I guess that I will settle with NTFS for the time being... And no, for home users with limited budgets and rational download/storage requirements, NAS \u003cb\u003eis not\u003c/b\u003e the solution.\u003c/p\u003e",
+        "raw_message": "I was on the same situation - just upgraded to Windows 7, and got a 2TB external HDD. However, OSX isn't on my list of requirements. Did my experiments:\n\n- FAT32: No way in hell. Once you add DVD9 ISOs and VM images, it quickly loses. Plus it has no POSIX permissions, no symlinks, heavy fragmentation... Just say NO.\n\n- ext3: There are a couple of very good drivers for Windows, Ext2IFS and ext2fsd. Sure, you lose journaling, but still, both are very solid drivers that I had been using for ages in XP (good performance, rock-solid stability). Unfortunately, UAC ruins the party here: you lose the ability to run executables under Vista/7/8 (regular EXEs will work, but anything that requires elevation or admin privilegies -like installers, for example- will FAIL with a obscure error message related to network paths). No fix (except for disabling UAC which is a big NO-NO) because this behaviour is intentional by MS unless you stick to FAT/NTFS/UDF.\n\n\n\n- UDF: Works wonders for small volumes. You lose XP write compatibility (only one driver was ever developed with write support for HDDs, SAI' WriteUDF! - it costs $89, and the company is now defunct, so if you still care about XP, better bite the bullet and buy a new PC). Unfortunately for large volumes (like my 2TB external), no filesystem check tool in this world will recognize it (tried with chkdsk and Solaris/OpenIndiana UDF fsck: both complain about the device having no filesystem). And no fsck under Linux means that if you care about data integrity you should not be using UDF. Oh, if your volume gets flagged as dirty, \u003ci\u003eunfortunately Linux won't \"unlock\" it for Windows, only chkdsk will do\u003c/i\u003e... and it also means that since chkdsk won't deal with such large volumes (\u003e1TB?), your FS ends tied to Linux anyway. Close, but no cigar. But for small devices (pendrives?), it's the way to go as long as you don't need XP write access.\n\n\n\n- NTFS: Sure, write performance sucks for native SATA drive/controller pairs. But on USB-attached drives it doesn't matter at all which FS you do pick - write performance is pretty much equal between NTFS, ext3 and UDF (albeit CPU usage is MUCH higher with NTFS when combined with the highly-CPU-bound USB interface). Symlinks come for free if you're using Vista or later. UNIX/POSIX file permissions require a user mapping file for ntfs-3g, after adding it, it works pretty much as expected. Limited error checking support under Linux, but for mutliboot scenarios, it doesn't matter that much anyway as long as one OS agrees to check and fix your FS.\n\n\n\n- exFAT: Is this a bad joke!?!??! Patent minefield, sucky drivers outside Windozeland, hyperpropietary specs... \u003cb\u003eNO.\u003c/b\u003e\n\n\nAs usual, Microsoft is ruining the party. But I guess that I will settle with NTFS for the time being... And no, for home users with limited budgets and rational download/storage requirements, NAS \u003cb\u003eis not\u003c/b\u003e the solution.",
+        "likes": 3,
+        "dislikes": 0,
+        "created_at": "2013-04-10T19:28:06",
+        "parent": -1,
+        "children": [
+          {
+            "id": 859007016,
+            "author_name": "irneb",
+            "author_username": "irneb",
+            "author_location": "",
+            "message": "\u003cp\u003eAgreed. Quick-fix cheap solution which works reasonably well would be NTFS. If you can stay with USB discs and don't worry too much about permissions and/or indexing/journaling while not in Windows. And a decent NAS is definitely not a cheap thing at all (our company invested in an industrial one with 10TB storage Raid 5, cost an arm and a leg, but works like a charm, and fast as lightning).\u003c/p\u003e\u003cp\u003eBut as I've stated another free alternative would be a NAS inside a VM inside each of your OS's. It's just not a quick-fix, but you can get near perfect performance with all the bells-n-whistles of a FS like ZFS (even stuff like snapshots to be able to roll-back to an earlier version of the file). It's just that you'd be giving up a bit of RAM and some CPU cycles.\u003c/p\u003e",
+            "raw_message": "Agreed. Quick-fix cheap solution which works reasonably well would be NTFS. If you can stay with USB discs and don't worry too much about permissions and/or indexing/journaling while not in Windows. And a decent NAS is definitely not a cheap thing at all (our company invested in an industrial one with 10TB storage Raid 5, cost an arm and a leg, but works like a charm, and fast as lightning).\n\nBut as I've stated another free alternative would be a NAS inside a VM inside each of your OS's. It's just not a quick-fix, but you can get near perfect performance with all the bells-n-whistles of a FS like ZFS (even stuff like snapshots to be able to roll-back to an earlier version of the file). It's just that you'd be giving up a bit of RAM and some CPU cycles.",
+            "likes": 0,
+            "dislikes": 0,
+            "created_at": "2013-04-10T20:35:40",
+            "parent": 858949007,
+            "children": []
+          }
+        ]
+      }
+    }
+  }
+}

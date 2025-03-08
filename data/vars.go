@@ -10,22 +10,33 @@ import (
 var Content embed.FS
 
 type Post struct {
+	FrontMatter    utils.FrontMatter
+	Tagsline       string
+	Markdown       []byte
+	HTML           string
+	Summary        string
+	LegacyComments []*LegacyComment
+}
+
+type KB struct {
 	FrontMatter utils.FrontMatter
 	Tagsline    string
 	Markdown    []byte
 	HTML        string
-	Summary     string
 }
 
 type Page struct {
-	Header string
-	Nav    string
-	Posts  []*Post
-	Footer string
+	Header   string
+	Nav      string
+	Posts    []*Post
+	SingleKB *KB
+	Footer   string
 }
 
 var Posts map[string]*Post = map[string]*Post{}
+var KBs map[string]*KB = map[string]*KB{}
 var TaggedPosts map[string][]*Post = map[string][]*Post{}
+var TaggedKBs map[string][]*KB = map[string][]*KB{}
 
 var ContentPrefix string = "content"
 var ThemesPrefix string = "themes"
