@@ -15,6 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Restore cached images
+        id: restore-cached-images
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            public/images
+          key: images-${{ hashFiles('data/content/blog/images/**') }}
+
       - name: Download Earthdate
         id: download-earthdate
         run: wget -O earthdate https://github.com/daegalus/earthdate/releases/latest/download/earthdate-linux-x86_64
@@ -32,6 +40,15 @@ jobs:
       
       - name: "Build"
         run: go run yblog.go deploy
+
+      - name: Save image cache
+        id: save-image-cache
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            public/images
+          key: ${{ steps.restore-cached-images.outputs.cache-primary-key }}
+  
 
       - name: "Compress"
         run: tar -cJf website.tar.zst public/*
