@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"image"
 	"io/fs"
-	"os"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -170,9 +169,10 @@ func (gen *Generator) CompileMarkdown() {
 	imageStoragePath := "images"
 
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Output, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, "")
-	if _, err := fs.Stat(os.DirFS(""), CachePrefix); err != nil {
+
+	if ok, err := afero.Exists(gen.Cache, CachePrefix); ok && err != nil {
 		log.WithField("prefix", CachePrefix).Info("Folder Exists")
-		if _, err := fs.Stat(os.DirFS(""), filepath.Join(CachePrefix, imageStoragePath)); err != nil {
+		if ok, err := afero.Exists(gen.Cache, filepath.Join(CachePrefix, imageStoragePath)); ok && err != nil {
 			log.WithField("prefix", filepath.Join(CachePrefix, imageStoragePath)).Info("Folder Exists")
 			utils.CopyFiles(gen.Cache, gen.Output, filepath.Join(CachePrefix, imageStoragePath), CachePrefix, "")
 		}
