@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"yblog/cache"
 	"yblog/utils"
 	"yblog/utils/goldmark_extensions"
 
@@ -23,7 +24,6 @@ import (
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
-	"github.com/zeebo/blake3"
 )
 
 func threadEncode(returnChannel chan []byte, imageData image.Image, wg *sync.WaitGroup, encodeFunc func(image.Image) []byte) {
@@ -32,52 +32,8 @@ func threadEncode(returnChannel chan []byte, imageData image.Image, wg *sync.Wai
 	returnChannel <- encodedImage
 }
 
-func encodeFilesInDir(file fs.DirEntry, imagePath string, imageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
+func encodeFilesInDir(file fs.DirEntry, imageStoragePath string, postImageDir fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
 	defer wg.Done()
-	postImagePath := filepath.Join(imagePath, imageDirEntry.Name(), file.Name())
-	filename := strings.Split(file.Name(), ".")[0]
-	imageByteData, err := afero.ReadFile(gen.Input, postImagePath)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading image")
-	}
-	cachedImageByteData, err := afero.ReadFile(gen.Cache, postImagePath)
-	if err != nil {
-		log.WithField("error", err).Warn("Error reading cached image")
-	}
-	bi := blake3.Sum512(imageByteData)
-	bci := blake3.Sum512(cachedImageByteData)
-	if bi == bci {
-		log.WithField("file", postImagePath).Info("Skipping encoding")
-		return // Skip encoding if the image is the same
-	}
-
-	imageData := utils.ImageFromPNG(afero.FromIOFS{FS: Content}, postImagePath)
-
-	wg.Add(2)
-	avifChan := make(chan []byte)
-	jxlChan := make(chan []byte)
-	webpChan := make(chan []byte)
-
-	go threadEncode(avifChan, imageData, wg, utils.ImageToAVIF)
-	go threadEncode(jxlChan, imageData, wg, utils.ImageToJXL)
-	go threadEncode(webpChan, imageData, wg, utils.ImageToWebP)
-
-	for i := 0; i < 2; i++ {
-		select {
-		case avifBytes := <-avifChan:
-			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif"))).Info("Converting to AVIF")
-			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "avif")), avifBytes, fs.ModePerm)
-		case jxlBytes := <-jxlChan:
-			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))).Info("Converting to JXL")
-			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "jxl")), jxlBytes, fs.ModePerm)
-		case webpBytes := <-webpChan:
-			log.WithField("file", filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp"))).Info("Converting to WebP")
-			afero.WriteFile(gen.Output, filepath.Join("images", imageDirEntry.Name(), fmt.Sprintf("%s.%s", filename, "webp")), webpBytes, fs.ModePerm)
-		}
-	}
-}
-
-func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDir fs.DirEntry, gen *Generator) {
 	filename := strings.Split(file.Name(), ".")[0]
 	extension := strings.Split(file.Name(), ".")[1]
 	if extension != "png" {
@@ -89,6 +45,7 @@ func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDi
 	jxlPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))
 	webpPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))
 	pngPath := filepath.Join(imageStoragePath, postImageDir.Name(), file.Name())
+
 	avifExists, _ := afero.Exists(gen.Output, avifPath)
 	jxlExists, _ := afero.Exists(gen.Output, jxlPath)
 	webpExists, _ := afero.Exists(gen.Output, webpPath)
@@ -106,14 +63,94 @@ func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDi
 			log.WithField("error", err).Fatal("Error writing png to output")
 		}
 	}
-	cachedImageByteData, err := afero.ReadFile(gen.Cache, filepath.Join(CachePrefix, imageStoragePath, postImageDir.Name(), file.Name()))
-	if err != nil {
-		log.WithField("error", err).Warn("Error reading cached image")
+
+	savedImageHashes, _ := cache.LoadImageHashes()
+	currentHashes, _ := cache.CalculateImageHashes()
+
+	imageDifferent := currentHashes[postImagePath] != savedImageHashes[postImagePath]
+
+	if !imageDifferent {
+		if avifExists && jxlExists && webpExists && pngExists {
+			log.WithField("file", postImagePath).Info("Skipping encoding")
+			return // Skip encoding if the image is the same
+		}
 	}
 
-	bi := blake3.Sum512(imageByteData)
-	bci := blake3.Sum512(cachedImageByteData)
-	imageDifferent := bi != bci
+	imageData := utils.ImageFromPNG(afero.FromIOFS{FS: Content}, postImagePath)
+
+	var avifChan, jxlChan, webpChan chan []byte
+	if !avifExists || imageDifferent {
+		wg.Add(1)
+		avifChan = make(chan []byte)
+		go threadEncode(avifChan, imageData, wg, utils.ImageToAVIF)
+	}
+	if !jxlExists || imageDifferent {
+		wg.Add(1)
+		jxlChan = make(chan []byte)
+		go threadEncode(jxlChan, imageData, wg, utils.ImageToJXL)
+	}
+	if !webpExists || imageDifferent {
+		wg.Add(1)
+		webpChan = make(chan []byte)
+		go threadEncode(webpChan, imageData, wg, utils.ImageToWebP)
+	}
+
+	for range 3 {
+		select {
+		case avifBytes, _ := <-avifChan:
+			log.WithField("file", filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))).Info("Converting to AVIF")
+			afero.WriteFile(gen.Output, filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif")), avifBytes, fs.ModePerm)
+		case jxlBytes, _ := <-jxlChan:
+			log.WithField("file", filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))).Info("Converting to JXL")
+			afero.WriteFile(gen.Output, filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl")), jxlBytes, fs.ModePerm)
+		case webpBytes, _ := <-webpChan:
+			log.WithField("file", filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))).Info("Converting to WebP")
+			afero.WriteFile(gen.Output, filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp")), webpBytes, fs.ModePerm)
+		}
+	}
+}
+
+func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDir fs.DirEntry, gen *Generator) {
+	filename := strings.Split(file.Name(), ".")[0]
+	extension := strings.Split(file.Name(), ".")[1]
+	if extension != "png" {
+		return
+	}
+	postImageDirPath := filepath.Join(ContentPrefix, imageStoragePath, postImageDir.Name())
+	postImagePath := filepath.Join(postImageDirPath, file.Name())
+	avifPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))
+	jxlPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))
+	webpPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))
+	pngPath := filepath.Join(imageStoragePath, postImageDir.Name(), file.Name())
+	log.
+		WithField("avif", avifPath).
+		WithField("jxl", jxlPath).
+		WithField("webp", webpPath).
+		WithField("png", pngPath).
+		Info("Images in Post")
+	avifExists, _ := afero.Exists(gen.Output, avifPath)
+	jxlExists, _ := afero.Exists(gen.Output, jxlPath)
+	webpExists, _ := afero.Exists(gen.Output, webpPath)
+	pngExists, _ := afero.Exists(gen.Output, pngPath)
+
+	imageByteData, err := afero.ReadFile(gen.Input, postImagePath)
+	if err != nil {
+		log.WithField("error", err).Fatal("Error reading image")
+	}
+
+	if !pngExists {
+		log.WithField("file", postImagePath).Info("PNG Doesn't Exist, writing data to output")
+		err := afero.WriteFile(gen.Output, pngPath, imageByteData, fs.ModePerm)
+		if err != nil {
+			log.WithField("error", err).Fatal("Error writing png to output")
+		}
+	}
+
+	savedImageHashes, _ := cache.LoadImageHashes()
+	currentHashes, _ := cache.CalculateImageHashes()
+
+	imageDifferent := currentHashes[postImagePath] != savedImageHashes[postImagePath]
+
 	if !imageDifferent {
 		if avifExists && jxlExists && webpExists && pngExists {
 			log.WithField("file", postImagePath).Info("Skipping encoding")
@@ -142,14 +179,14 @@ func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDi
 	}
 }
 
-func encodeAllDirs(imagePath string, imageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
+func encodeAllDirs(imageStoragePath string, imageStorageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
 	defer wg.Done()
-	log.WithField("dir", imageDirEntry.Name()).Info("Converting in Post")
-	if imageDirEntry.IsDir() {
-		postImageDir, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imagePath, imageDirEntry.Name()))
+	log.WithField("dir", imageStorageDirEntry.Name()).Info("Converting in Post")
+	if imageStorageDirEntry.IsDir() {
+		postImageDir, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath, imageStorageDirEntry.Name()))
 		wg.Add(len(postImageDir))
-		for _, file := range postImageDir {
-			go encodeFilesInDir(file, imagePath, imageDirEntry, gen, wg)
+		for _, postImageFile := range postImageDir {
+			go encodeFilesInDir(postImageFile, imageStoragePath, imageStorageDirEntry, gen, wg)
 		}
 	}
 }
@@ -170,28 +207,21 @@ func (gen *Generator) CompileMarkdown() {
 
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Output, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, "")
 
-	if ok, err := afero.Exists(gen.Cache, CachePrefix); ok && err != nil {
-		log.WithField("prefix", CachePrefix).Info("Folder Exists")
-		if ok, err := afero.Exists(gen.Cache, filepath.Join(CachePrefix, imageStoragePath)); ok && err != nil {
-			log.WithField("prefix", filepath.Join(CachePrefix, imageStoragePath)).Info("Folder Exists")
+	if ok, _ := afero.Exists(gen.Cache, CachePrefix); ok {
+		if ok, _ := afero.Exists(gen.Cache, filepath.Join(CachePrefix, imageStoragePath)); ok {
 			utils.CopyFiles(gen.Cache, gen.Output, filepath.Join(CachePrefix, imageStoragePath), CachePrefix, "")
 		}
 	}
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Cache, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, CachePrefix)
 
-	// afero.Walk(gen.Output, ".", func(path string, info fs.FileInfo, err error) error {
-	// 	log.WithField("path", path).Info("Walking")
-	// 	return err
-	// })
-	// os.Exit(0)
-
 	imageStorageDirEntries, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath))
-	//var wg sync.WaitGroup
-	//wg.Add(len(imageDirEntries))
+	wg := sync.WaitGroup{}
+	wg.Add(len(imageStorageDirEntries))
 	for _, imageStorageDirEntry := range imageStorageDirEntries {
-		//go encodeAllDirs(imagePath, imageDirEntry, gen, &wg)
-		encodeAllDirsSync(imageStoragePath, imageStorageDirEntry, gen)
+		go encodeAllDirs(imageStoragePath, imageStorageDirEntry, gen, &wg)
+		//encodeAllDirsSync(imageStoragePath, imageStorageDirEntry, gen)
 	}
+	wg.Wait()
 
 	log.Info("Compiling markdown")
 	md := goldmark.New(

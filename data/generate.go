@@ -36,7 +36,7 @@ func generateTemplateHTML[T Post | KB](fs afero.Fs, file string, in T) string {
 		log.WithField("error", err).WithField("file", file).Fatal("Error read template file")
 	}
 
-	tmpl, err := template.New(file).Parse(string(templateString))
+	tmpl, err := template.New(file).Funcs(template.FuncMap{"now": time.Now}).Parse(string(templateString))
 	if err != nil {
 		log.WithField("error", err).WithField("file", file).Fatal("Error parsing template")
 	}
@@ -66,13 +66,13 @@ func (gen *Generator) generatePost(post Post) string {
 	// 	log.WithField("post", post.HTML).Info("Generated post")
 	// }
 
-	uttmpl, _ := template.New("utPage").Parse(post.HTML)
+	uttmpl, _ := template.New("utPage").Funcs(template.FuncMap{"now": time.Now}).Parse(post.HTML)
 	var templatedOut strings.Builder
 	err = uttmpl.Execute(&templatedOut, page)
 
 	post.HTML = templatedOut.String()
 
-	tmpl, err := template.New("page").Parse(string(postHTML))
+	tmpl, err := template.New("page").Funcs(template.FuncMap{"now": time.Now}).Parse(string(postHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing post template")
 	}
@@ -107,7 +107,7 @@ func (gen *Generator) generateIndex() string {
 		Footer: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
 	}
 
-	tmpl, err := template.New("index").Parse(string(indexHTML))
+	tmpl, err := template.New("index").Funcs(template.FuncMap{"now": time.Now}).Parse(string(indexHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing index template")
 	}
@@ -133,7 +133,7 @@ func (gen *Generator) generateFront() string {
 		Footer:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
 	}
 
-	tmpl, err := template.New("front").Parse(string(frontHTML))
+	tmpl, err := template.New("front").Funcs(template.FuncMap{"now": time.Now}).Parse(string(frontHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing index template")
 	}
@@ -163,13 +163,13 @@ func (gen *Generator) generateKB(kb KB) string {
 	// 	log.WithField("post", post.HTML).Info("Generated post")
 	// }
 
-	uttmpl, _ := template.New("utPage").Parse(kb.HTML)
+	uttmpl, _ := template.New("utPage").Funcs(template.FuncMap{"now": time.Now}).Parse(kb.HTML)
 	var templatedOut strings.Builder
 	err = uttmpl.Execute(&templatedOut, page)
 
 	kb.HTML = templatedOut.String()
 
-	tmpl, err := template.New("page").Parse(string(kbHTML))
+	tmpl, err := template.New("page").Funcs(template.FuncMap{"now": time.Now}).Parse(string(kbHTML))
 	if err != nil {
 		log.WithField("error", err).Fatal("Error parsing post template")
 	}

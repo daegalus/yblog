@@ -17,5 +17,3 @@ I live in Denmark with my family, after moving here in September 2024 from the U
 the 30 years prior. I was born in Bulgaria and moved to the USA when I was 5.
 
 The software powerin this page is custom built and only the blog is currently functional.
-
-[Blog](/blog) - [Knowledge Base](/) - [Gallery](/) - [Historical](/)

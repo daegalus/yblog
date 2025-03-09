@@ -54,3 +54,20 @@ func CopyFiles(input afero.Fs, output afero.Fs, rootPath string, stripPrefix str
 		log.WithError(err).Fatal("Error walking files during copyFiles")
 	}
 }
+
+func PrintWalk(input afero.Fs, rootPath string) {
+	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			log.WithError(err).Fatal("Error reading files during walk")
+		}
+		if info.IsDir() {
+			log.WithField("type", "dir").WithField("path", path).Info("DebugWalk")
+		} else {
+			log.WithField("type", "file").WithField("path", path).Info("DebugWalk")
+		}
+		return nil
+	})
+	if err != nil {
+		log.WithError(err).Fatal("Error walking files")
+	}
+}

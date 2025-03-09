@@ -1,6 +1,6 @@
 <title>{{.FrontMatter.Title}}</title>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
@@ -35,6 +35,35 @@
     }
   }
 
+  @media screen and (max-width: 500px) {
+    .post .tagline {
+      display: none;
+    }
+
+    .social {
+      justify-content: center;
+    }
+
+    .menu {
+      float: none;
+      display: block;
+    }
+
+    body > nav {
+      text-align: center;
+    }
+    
+  }
+
+  @media screen and (min-width: 500px) {
+    .social {
+      justify-content: right;
+    }
+    .menu {
+      float: left;
+    }
+  }
+
   article > h2 {
     color: #d88c93;
   }
@@ -53,31 +82,35 @@
     border-radius: 0;
   }
 
-  body > nav > span {
-    float: left;
+  .menu {
     margin: 0.4em;
   }
 
-  body > nav > span > a {
+  .menu > a {
     color: var(--text-bright);
     text-decoration: none;
   }
 
-  body > nav > ul {
+  .menu > span {
+    font-size: 0.8em; 
+    text-align: center;
+    display: block;
+  }
+
+  .social {
     display: flex;
     flex-direction: row;
-    justify-content: right;
     align-items: center;
     list-style: none;
     padding: 0.2em;
     margin: 0.4em;
   }
 
-  body > nav > ul > li {
+  .social > li {
     margin: 0.2em;
   }
 
-  body > nav > ul > li > a > svg {
+  .social > li > a > svg {
     width: 1.5em;
     height: 1.5em;
   }
@@ -88,6 +121,10 @@
 
   a[href^="mailto"]::before {
     content: "";
+  }
+
+  .post .tagline {
+    float: right;
   }
 
   .post > h5 > span {
@@ -120,6 +157,7 @@
 
   .footer {
     margin: 0 auto;
+    margin-top: 5em;
   }
 
   .text-centered {

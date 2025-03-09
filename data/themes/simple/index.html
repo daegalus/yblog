@@ -7,7 +7,7 @@
         {{.Nav}}
         {{ range .Posts }}
         <article class="post">
-            <h5>{{.FrontMatter.Date}}<span style="float:right">{{.Tagsline}}</span></h5>
+            <h5>{{.FrontMatter.Date}}<span class="tagline">{{.Tagsline}}</span></h5>
             <a href="/blog/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
             {{.Summary}} 
             <br>
