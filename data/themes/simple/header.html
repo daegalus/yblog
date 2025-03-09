@@ -12,6 +12,7 @@
       --background: #120c0e;
       --background-body: #120c0e;
       --links: #eb99a1;
+      --visited: #e26f7a;
       --code: #eb99a1;
       --text-bright: #f5f5f5;
     }
@@ -26,6 +27,7 @@
       --background: #f5f5f5;
       --background-body: #f5f5f5;
       --links: #f2737f; /* #eb99a1; */
+      --visited: #e26f7a;
       --code: #f2737f;
       --text-bright: #120c0e;
     }
@@ -70,6 +72,14 @@
 
   article > h3 {
     color: #cf606b;
+  }
+
+  a {
+    color: var(--links);
+  }
+
+  a:visited {
+    color: var(--visited);
   }
 
   body {
