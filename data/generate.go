@@ -3,6 +3,7 @@ package data
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -199,7 +200,7 @@ func (gen *Generator) generateFeeds() (string, string, string) {
 		Link:        &feeds.Link{Href: "https://yulian.kuncheff.com"},
 		Description: "Yulian Kuncheff's Blog",
 		Author:      &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
-		Copyright:   fmt.Sprintf("© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> %s", time.Now().Year()),
+		Copyright:   fmt.Sprintf("© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> %s", strconv.Itoa(time.Now().Year())),
 		Created:     time.Now(),
 		Language:    "en-us",
 		Generator:   "yblog",
