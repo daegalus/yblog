@@ -2,19 +2,17 @@ module yblog
 
 go 1.23.0
 
-toolchain go1.24.0
+toolchain go1.24.1
 
 require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/lipgloss v1.0.0 // indirect
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
-	github.com/daegalus/xxh3 v0.0.0-20250309091422-cb810300c3b8 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/elliotchance/orderedmap/v2 v2.7.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
@@ -45,6 +43,7 @@ require (
 	github.com/alecthomas/kong v1.8.1
 	github.com/caarlos0/log v0.4.8
 	github.com/daegalus/feeds v1.3.3
+	github.com/daegalus/xxh3 v0.0.0-20250309091422-cb810300c3b8
 	github.com/gen2brain/avif v0.4.3
 	github.com/gen2brain/jpegxl v0.4.4
 	github.com/gen2brain/webp v0.5.4
@@ -57,6 +56,4 @@ require (
 	github.com/yuin/goldmark v1.7.8
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	github.com/yuin/goldmark-meta v1.1.0
-	github.com/zeebo/blake3 v0.2.4
-	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 )
