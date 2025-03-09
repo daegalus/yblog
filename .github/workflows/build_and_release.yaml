@@ -61,3 +61,7 @@ jobs:
           files: |
             website.tar.zst
 
+      - name: "Post Request to Statichost.eu builder"
+        run: |
+          curl -X POST https://builder.statichost.eu/digital-garden
+
