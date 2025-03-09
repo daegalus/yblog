@@ -199,7 +199,7 @@ func (gen *Generator) generateFeeds() (string, string, string) {
 		Link:        &feeds.Link{Href: "https://yulian.kuncheff.com"},
 		Description: "Yulian Kuncheff's Blog",
 		Author:      &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
-		Copyright:   "© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> 2022",
+		Copyright:   fmt.Sprintf("© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> %s", time.Now().Year()),
 		Created:     time.Now(),
 		Language:    "en-us",
 		Generator:   "yblog",
