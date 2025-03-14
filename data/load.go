@@ -350,6 +350,7 @@ func (gen *Generator) postSpecific(frontmatter utils.FrontMatter, content []byte
 		Markdown:       content,
 		HTML:           html,
 		LegacyComments: legacyComments,
+		PrimaryDomain:  gen.config.Site.PrimaryDomain
 	}
 
 	gen.generateSummary(&post)
@@ -377,9 +378,10 @@ func (gen *Generator) postSpecific(frontmatter utils.FrontMatter, content []byte
 func (gen *Generator) kbSpecific(frontmatter utils.FrontMatter, content []byte, html string) {
 
 	kb := KB{
-		FrontMatter: frontmatter,
-		Markdown:    content,
-		HTML:        html,
+		FrontMatter:   frontmatter,
+		Markdown:      content,
+		HTML:          html,
+		PrimaryDomain: gen.config.Site.PrimaryDomain
 	}
 
 	KBs[frontmatter.Slug] = &kb

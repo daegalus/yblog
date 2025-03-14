@@ -1,3 +1,4 @@
 [site]
+primary-domain="yulian.kuncheff.com"
 theme="simple"
 output="./public"

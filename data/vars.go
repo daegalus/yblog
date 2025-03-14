@@ -23,6 +23,7 @@ type KB struct {
 	Tagsline    string
 	Markdown    []byte
 	HTML        string
+	PrimaryDomain string
 }
 
 type Page struct {
@@ -31,6 +32,7 @@ type Page struct {
 	Posts    []*Post
 	SingleKB *KB
 	Footer   string
+	PrimaryDomain string
 }
 
 var Posts map[string]*Post = map[string]*Post{}
@@ -44,6 +46,7 @@ var CachePrefix string = "public"
 
 type Config struct {
 	Site struct {
+		PrimaryDomain string `toml:"primary-domain"`
 		Theme  string `toml:"theme"`
 		Output string `toml:"output"`
 	} `toml:"site"`
