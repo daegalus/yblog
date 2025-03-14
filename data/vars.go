@@ -16,6 +16,7 @@ type Post struct {
 	HTML           string
 	Summary        string
 	LegacyComments []*LegacyComment
+	PrimaryDomain string
 }
 
 type KB struct {
@@ -32,7 +33,6 @@ type Page struct {
 	Posts    []*Post
 	SingleKB *KB
 	Footer   string
-	PrimaryDomain string
 }
 
 var Posts map[string]*Post = map[string]*Post{}
