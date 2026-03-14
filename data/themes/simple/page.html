@@ -1,0 +1,17 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <article class="h-entry standalone-page">
+            <h1 class="p-name">{{.SinglePage.FrontMatter.Title}}</h1>
+            <span class="p-author h-card" style="display:none;">
+                <a class="p-name u-url" href="https://yulian.kuncheff.com">Yulian Kuncheff</a>
+            </span>
+            <div class="e-content">{{.SinglePage.HTML}}</div>
+        </article>
+        {{.Footer}}
+    </body>
+</html>

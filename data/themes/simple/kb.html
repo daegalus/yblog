@@ -5,7 +5,28 @@
 
     <body>
         {{.Nav}}
-        {{.SingleKB.HTML}}
+        <article class="h-entry kb-article">
+            <h5>
+                <time class="dt-published" datetime="{{.SingleKB.FrontMatter.Date}}">{{.SingleKB.FrontMatter.Date}}</time>
+                <span>{{ range .SingleKB.FrontMatter.Tags }}<a class="p-category" href="/tags/{{.}}">#{{.}}</a> {{ end }}</span>
+            </h5>
+            <h1 class="p-name">{{.SingleKB.FrontMatter.Title}}</h1>
+            <span class="p-author h-card" style="display:none;">
+                <a class="p-name u-url" href="https://yulian.kuncheff.com">Yulian Kuncheff</a>
+            </span>
+            <div class="e-content">{{.SingleKB.HTML}}</div>
+            {{ if .SingleKB.Backlinks }}
+            <hr>
+            <section class="backlinks">
+                <h4>Pages that link here</h4>
+                <ul>
+                    {{ range .SingleKB.Backlinks }}
+                    <li><a href="/kb/{{.Slug}}">{{.Slug}}</a><br/><i>"...{{.Context}}..."</i></li>
+                    {{ end }}
+                </ul>
+            </section>
+            {{ end }}
+        </article>
         {{.Footer}}
     </body>
 </html>

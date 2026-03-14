@@ -1,0 +1,28 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <div class="h-entry">
+            <h1 class="p-name">{{.SingleAlbum.Title}}</h1>
+            <p class="p-summary">{{.SingleAlbum.Description}}</p>
+            <span class="p-author h-card" style="display:none;">
+                <a class="p-name u-url" href="https://yulian.kuncheff.com">Yulian Kuncheff</a>
+            </span>
+            <p><a href="/gallery">← Back to Gallery</a></p>
+            <div class="album-images e-content">
+                {{ range .SingleAlbum.Images }}
+                <figure class="album-image">
+                    <a href="/gallery/{{$.SingleAlbum.Slug}}/images/{{.}}" target="_blank">
+                        <img src="/gallery/{{$.SingleAlbum.Slug}}/images/{{.}}" alt="{{.}}" loading="lazy" class="u-photo">
+                    </a>
+                </figure>
+                {{ end }}
+            </div>
+        </div>
+
+        {{.Footer}}
+    </body>
+</html>

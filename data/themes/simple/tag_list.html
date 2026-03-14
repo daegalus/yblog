@@ -1,0 +1,33 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <h2 class="page-title">Articles tagged with "#{{.CurrentTag}}"</h2>
+        <ul class="posts tags-list">
+            {{ range .Posts }}
+            <li class="post">
+                <a href="/blog/{{.FrontMatter.Slug}}">{{.FrontMatter.Title}}</a>
+                <span class="meta">{{.FrontMatter.Date}}</span>
+            </li>
+            {{ end }}
+            
+            {{ range .KBPages }}
+            <li class="post">
+                <a href="/kb/{{.Path}}">{{.FrontMatter.Title}}</a>
+                <span class="meta">{{.FrontMatter.Date}}</span>
+            </li>
+            {{ end }}
+            
+            {{ range .TILList }}
+            <li class="post">
+                <a href="/til#{{.FrontMatter.Slug}}">TIL: {{.FrontMatter.Title}}</a>
+                <span class="meta">{{.FrontMatter.Date}}</span>
+            </li>
+            {{ end }}
+        </ul>
+        {{.Footer}}
+    </body>
+</html>

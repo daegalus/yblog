@@ -5,15 +5,20 @@
 
     <body>
         {{.Nav}}
+        <div class="h-feed">
         {{ range .Posts }}
-        <article class="post">
-            <h5>{{.FrontMatter.Date}}<span class="tagline">{{.Tagsline}}</span></h5>
-            <a href="/blog/{{.FrontMatter.Slug}}"><h2>{{.FrontMatter.Title}}</h2></a>
-            {{.Summary}} 
+        <article class="h-entry post">
+            <h5>
+                <time class="dt-published" datetime="{{.FrontMatter.Date}}">{{.FrontMatter.Date}}</time>
+                <span class="tagline">{{.Tagsline}}</span>
+            </h5>
+            <a href="/blog/{{.FrontMatter.Slug}}" class="u-url"><h2 class="p-name">{{.FrontMatter.Title}}</h2></a>
+            <p class="p-summary">{{.Summary}}</p>
             <br>
-            <a href="/blog/{{.FrontMatter.Slug}}"><span">Read more</span></a>
+            <a href="/blog/{{.FrontMatter.Slug}}"><span>Read more</span></a>
         </article>
         {{ end }}
+        </div>
 
         {{.Footer}}
     </body>

@@ -19,35 +19,40 @@ type FrontMatter struct {
 	Tags     []string  `yaml:"tags"`
 }
 
-func StripFrontMatter(data []byte) ([]byte, FrontMatter) {
+func StripFrontMatter(data []byte) ([]byte, FrontMatter, error) {
 	var matter FrontMatter
 	rest, err := frontmatter.Parse(bytes.NewReader(data), &matter)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing frontmatter")
-		panic(err)
+		log.WithField("error", err).Error("Error parsing frontmatter")
+		return nil, matter, err
 	}
-	matter.Date = ModifyDate(matter.Date)
-	return rest, matter
+	if matter.Date != "" {
+		matter.Date, err = ModifyDate(matter.Date)
+		if err != nil {
+			return nil, matter, err
+		}
+	}
+	return rest, matter, nil
 }
 
-func ModifyDate(date string) string {
+func ModifyDate(date string) (string, error) {
 	layout := "2006-01-02T15:04:05Z"
 	t, err := time.Parse(layout, date)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error modifying date")
-		panic(err)
+		log.WithField("error", err).WithField("date", date).Error("Error modifying date")
+		return "", err
 	}
 
-	return t.Format("January 2, 2006 | 15:04")
+	return t.Format("January 2, 2006 | 15:04"), nil
 }
 
-func ParseDate(date string) time.Time {
+func ParseDate(date string) (time.Time, error) {
 	layout := "2006-01-02T15:04:05Z"
 	t, err := time.Parse(layout, date)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing date")
-		panic(err)
+		log.WithField("error", err).WithField("date", date).Error("Error parsing date")
+		return time.Time{}, err
 	}
 
-	return t
+	return t, nil
 }

@@ -5,10 +5,16 @@
 
   <body>
     {{.Nav}}
-    <article class="post">
-      <h5><time>{{(index .Posts 0).FrontMatter.Date}}</time><span>{{(index .Posts 0).Tagsline}}</span></h5>
-      <h1>{{(index .Posts 0).FrontMatter.Title}}</h1>
-      <article>{{(index .Posts 0).HTML}}</article>
+    <article class="h-entry post">
+      <h5>
+        <time class="dt-published" datetime="{{(index .Posts 0).FrontMatter.Date}}">{{(index .Posts 0).FrontMatter.Date}}</time>
+        <span>{{(index .Posts 0).Tagsline}}</span>
+      </h5>
+      <h1 class="p-name">{{(index .Posts 0).FrontMatter.Title}}</h1>
+      <span class="p-author h-card" style="display:none;">
+        <a class="p-name u-url" href="https://yulian.kuncheff.com">Yulian Kuncheff</a>
+      </span>
+      <div class="e-content">{{(index .Posts 0).HTML}}</div>
     </article>
     <area class="comments">
       {{ if (index .Posts 0).LegacyComments }}

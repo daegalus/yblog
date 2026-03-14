@@ -1,0 +1,29 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <div class="h-feed">
+        <h1 class="p-name">Today I Learned</h1>
+        <p>Short snippets of things I learn along the way.</p>
+        {{ range .TILList }}
+        <article class="h-entry til-entry">
+            <h3 class="p-name">{{.FrontMatter.Title}}</h3>
+            <span class="til-meta">
+                <time class="dt-published" datetime="{{.FrontMatter.Date}}">{{.FrontMatter.Date}}</time> ·
+                {{ range .FrontMatter.Tags }}<a class="p-category" href="/tags/{{.}}">#{{.}}</a> {{ end }}
+            </span>
+            <span class="p-author h-card" style="display:none;">
+                <a class="p-name u-url" href="https://yulian.kuncheff.com">Yulian Kuncheff</a>
+            </span>
+            <div class="e-content til-content">{{.HTML}}</div>
+        </article>
+        <hr>
+        {{ end }}
+        </div>
+
+        {{.Footer}}
+    </body>
+</html>

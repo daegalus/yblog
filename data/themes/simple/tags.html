@@ -1,0 +1,18 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <h1>Tags</h1>
+        <p>Browse content by tag across blog posts, knowledge base, and TILs.</p>
+        <div class="tag-cloud">
+            {{ range $tag, $count := .AllTags }}
+            <span class="tag-item"><a href="/tags/{{$tag}}">{{$tag}}</a> <small>({{$count}})</small></span>
+            {{ end }}
+        </div>
+
+        {{.Footer}}
+    </body>
+</html>

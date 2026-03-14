@@ -1,0 +1,22 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <h1 class="p-name">Gallery</h1>
+        <div class="gallery-grid h-feed">
+            {{ range .GalleryAlbums }}
+            <a href="/gallery/{{.Slug}}" class="album-card h-entry u-url">
+                <img src="/gallery/{{.Slug}}/images/{{.Cover}}" alt="{{.Title}}" class="u-photo">
+                <h3 class="p-name">{{.Title}}</h3>
+                <p class="p-summary">{{.Description}}</p>
+                <span class="p-author h-card" style="display:none;"><span class="p-name">Yulian Kuncheff</span></span>
+            </a>
+            {{ end }}
+        </div>
+
+        {{.Footer}}
+    </body>
+</html>

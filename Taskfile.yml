@@ -1,0 +1,59 @@
+version: '3'
+
+vars:
+  VERSION: '0.0.1'
+  BUILD_DIR: 'build'
+  LDFLAGS: "-s -w -extldflags=-static-pie -X 'main.Version={{.VERSION}}' -X 'main.BuildDate={{now | date \"2006-01-02T15:04:05Z07:00\"}}'"
+
+tasks:
+  default:
+    cmds:
+      - task: all
+
+  all:
+    desc: Build all distributions (Linux, Windows, MacOS, WASM)
+    deps: [deps, linux, windows, macos, wasm]
+
+  deps:
+    desc: Install dependencies
+    cmds:
+      - rm -rf {{.BUILD_DIR}}
+      - mkdir -p {{.BUILD_DIR}}
+      - go mod download
+
+  linux:
+    desc: Build Linux binaries
+    cmds:
+      - task: build-target
+        vars: { GOOS: linux, GOARCH: amd64, OUT: "yblog-linux-amd64" }
+      - task: build-target
+        vars: { GOOS: linux, GOARCH: arm64, OUT: "yblog-linux-arm64" }
+
+  windows:
+    desc: Build Windows binaries
+    cmds:
+      - task: build-target
+        vars: { GOOS: windows, GOARCH: amd64, OUT: "yblog-windows-amd64.exe" }
+
+  macos:
+    desc: Build MacOS binaries
+    cmds:
+      - task: build-target
+        vars: { GOOS: darwin, GOARCH: amd64, OUT: "yblog-macos-amd64" }
+      - task: build-target
+        vars: { GOOS: darwin, GOARCH: arm64, OUT: "yblog-macos-arm64" }
+
+  wasm:
+    desc: Build WASM binaries
+    cmds:
+      - task: build-target
+        vars: { GOOS: js, GOARCH: wasm, OUT: "yblog-js-wasm" }
+
+  build-target:
+    internal: true
+    env:
+      CGO_ENABLED: '0'
+      GOOS: '{{.GOOS}}'
+      GOARCH: '{{.GOARCH}}'
+    cmds:
+      - go build --ldflags "{{.LDFLAGS}}" -o {{.BUILD_DIR}}/{{.OUT}} yblog.go

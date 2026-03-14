@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"io/fs"
+	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/BurntSushi/toml"
@@ -85,7 +87,7 @@ func copyFiles(input afero.Fs, output afero.Fs, rootPath string) {
 	}
 }
 
-func startServeWatcher(config data.Config, generator *data.Generator, memfsInput afero.Fs, memfsOutput afero.Fs, memfsCache afero.Fs) {
+func startServeWatcher(config data.Config, site *data.SiteState) {
 	w := watcher.New()
 	w.SetMaxEvents(1)
 	w.FilterOps(watcher.Write, watcher.Create, watcher.Remove, watcher.Rename)
@@ -97,9 +99,10 @@ func startServeWatcher(config data.Config, generator *data.Generator, memfsInput
 				fmt.Println(event) // Print the event's info.
 				genNew, _ := initialize()
 				genNew.CompileMarkdown()
-				generator.Input = genNew.Input
-				generator.Output = genNew.Output
-				generator.Cache = genNew.Cache
+				
+				site.Lock()
+				site.Generator = genNew
+				site.Unlock()
 			case err := <-w.Error:
 				log.WithError(err).Fatal("Error watching files")
 			case <-w.Closed:
@@ -133,9 +136,13 @@ func (s *Serve) Run(ctx *Context) error {
 	generator, config := initialize()
 	generator.CompileMarkdown()
 
+	site := &data.SiteState{
+		Generator: generator,
+	}
+
 	utils.CopyFiles(generator.Output, generator.Cache, ".", "", "./public")
 
-	startServeWatcher(*config, generator, generator.Input, generator.Output, generator.Cache)
+	startServeWatcher(*config, site)
 
 	e := echo.New()
 
@@ -166,22 +173,49 @@ func (s *Serve) Run(ctx *Context) error {
 	e.Use(middleware.Gzip())
 	e.HideBanner = true
 
-	imageFS := echo.MustSubFS(afero.NewIOFS(generator.Output), "images")
-	handlrs := handlers.NewHandlers(config, generator.Output)
+	handlrs := handlers.NewHandlers(config, site)
 
 	e.GET("", handlrs.IndexHandler)
-	e.StaticFS("/images/", imageFS)
+	e.GET("/", handlrs.IndexHandler)
+	e.GET("/blog", handlrs.BlogIndexHandler)
 	e.FileFS("/favicon.ico", "favicon.ico", afero.NewIOFS(generator.Output))
 	// e.FileFS("/index.xml", "/feed.atom", outputIO)
 	// e.FileFS("/feed.atom", "feed.atom", outputIO)
 	// e.FileFS("/feed.rss", "feed.rss", outputIO)
 	// e.FileFS("/feed.json", "feed.json", outputIO)
 	e.GET("/feed.:format", handlrs.FeedHandler)
+	e.GET("/feed_:type.:format", handlrs.SpecificFeedHandler)
 	e.GET("/index.xml", handlrs.FeedHandler)
 	e.GET("/posts/:post", handlrs.PostHandler)
 	e.GET("/:post", handlrs.PostHandler)
 	e.GET("/tags/:tag", handlrs.TagsHandler)
-	e.Start(":8080")
+	e.GET("/kb", handlrs.KBIndexHandler)
+	e.GET("/kb/*", handlrs.KBHandler)
+	e.GET("/historical/*", func(c echo.Context) error {
+		filePath := c.Param("*")
+		if filePath == "" {
+			return c.String(http.StatusNotFound, "Not Found")
+		}
+		return handlrs.ServeFile(c, fmt.Sprintf("historical/%s", filePath))
+	})
+	e.GET("/gallery", handlrs.GalleryIndexHandler)
+	e.GET("/gallery/*", handlrs.GalleryHandler)
+	e.GET("/images/*", func(c echo.Context) error {
+		filePath := c.Param("*")
+		if filePath == "" {
+			return c.String(http.StatusNotFound, "Not Found")
+		}
+		return handlrs.ServeFile(c, fmt.Sprintf("images/%s", filePath))
+	})
+	e.GET("/favicon.ico", func(c echo.Context) error {
+		return handlrs.ServeFile(c, "favicon.ico")
+	})
+	e.GET("/bookmarks", func(c echo.Context) error {
+		return c.Redirect(http.StatusFound, "https://links.mistlyric.net")
+	})
+	if err := e.Start(":8080"); err != nil {
+		log.WithError(err).Fatal("Failed to start server")
+	}
 
 	return nil
 }
@@ -229,6 +263,53 @@ func (d *Deploy) Run(ctx *Context) error {
 	return nil
 }
 
+type New struct {
+	Type  string `arg:"" help:"Content type (post, kb, til, page)"`
+	Title string `arg:"" help:"Title of the content"`
+}
+
+func (n *New) Run(ctx *Context) error {
+	slug := strings.ToLower(strings.ReplaceAll(n.Title, " ", "-"))
+	baseDir := map[string]string{
+		"post": "data/content/blog",
+		"kb":   "data/content/kb",
+		"til":  "data/content/til",
+		"page": "data/content/pages",
+	}
+
+	targetDir, exists := baseDir[n.Type]
+	if !exists {
+		log.Fatalf("Invalid content type: %s. Must be post, kb, til, or page", n.Type)
+	}
+
+	dateStr := time.Now().Format("2006-01-02T15:04:05Z")
+	content := fmt.Sprintf(`---
+author: "Yulian Kuncheff"
+date: %s
+draft: false
+slug: "%s"
+title: "%s"
+tags: []
+type: "%s"
+---
+
+Write your content here...`, dateStr, slug, n.Title, n.Type)
+
+	filePath := filepath.Join(targetDir, fmt.Sprintf("%s.md", slug))
+	err := os.MkdirAll(targetDir, 0755)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create directories")
+	}
+
+	err = os.WriteFile(filePath, []byte(content), 0644)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to write new file")
+	}
+
+	log.WithField("file", filePath).Info("Successfully created new content")
+	return nil
+}
+
 type Context struct {
 	Debug bool
 }
@@ -238,6 +319,7 @@ var cli struct {
 
 	Serve  Serve  `cmd:"" help:"Serve the generated files"`
 	Deploy Deploy `cmd:"" help:"Deploy the generated files"`
+	New    New    `cmd:"" help:"Create new content scaffolding"`
 }
 
 func main() {

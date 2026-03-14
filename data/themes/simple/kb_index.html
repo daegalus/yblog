@@ -1,0 +1,19 @@
+<html lang="en-us">
+    <head>
+        {{.Header}}
+    </head>
+
+    <body>
+        {{.Nav}}
+        <h1>Knowledge Base</h1>
+        <p>Browse all articles in the knowledge base.</p>
+        {{ range .KBPages }}
+        <article class="kb-entry">
+            <a href="/kb/{{.Path}}"><h3>{{.FrontMatter.Title}}</h3></a>
+            <span class="kb-meta">{{.FrontMatter.Date}} · {{.Tagsline}}</span>
+        </article>
+        {{ end }}
+
+        {{.Footer}}
+    </body>
+</html>
