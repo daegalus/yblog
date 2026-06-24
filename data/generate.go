@@ -2,8 +2,8 @@ package data
 
 import (
 	"fmt"
+	"io/fs"
 	"sort"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -16,18 +16,20 @@ import (
 )
 
 type Generator struct {
-	config      *Config
-	Input       afero.Fs
-	Output      afero.Fs
-	Cache       afero.Fs
-	Posts       map[string]*Post
-	KBs         map[string]*KB
-	Albums      map[string]*Album
-	TILs        map[string]*TIL
-	Pages       map[string]*StandalonePage
-	TaggedPosts map[string][]*Post
-	TaggedKBs   map[string][]*KB
-	TaggedTILs  map[string][]*TIL
+	config         *Config
+	Input          afero.Fs
+	Output         afero.Fs
+	Cache          afero.Fs
+	Posts          map[string]*Post
+	KBs            map[string]*KB
+	Albums         map[string]*Album
+	TILs           map[string]*TIL
+	Pages          map[string]*StandalonePage
+	TaggedPosts    map[string][]*Post
+	TaggedKBs      map[string][]*KB
+	TaggedTILs     map[string][]*TIL
+	templates      map[string]*template.Template
+	legacyComments map[string]*LegacyPost
 }
 
 func NewGenerator(config *Config, input afero.Fs, output afero.Fs, cache afero.Fs) *Generator {
@@ -44,231 +46,126 @@ func NewGenerator(config *Config, input afero.Fs, output afero.Fs, cache afero.F
 		TaggedPosts: map[string][]*Post{},
 		TaggedKBs:   map[string][]*KB{},
 		TaggedTILs:  map[string][]*TIL{},
+		templates:   map[string]*template.Template{},
 	}
 }
 
-func generateTemplateHTML[T Post | KB](fs afero.Fs, file string, in T) string {
-	templateString, err := afero.ReadFile(fs, file)
-	if err != nil {
-		log.WithField("error", err).WithField("file", file).Fatal("Error read template file")
+// themeTemplate returns the parsed template for the named file in the active theme,
+// parsing and caching it on first use. Template read/parse failures panic; the panic
+// is recovered in CompileMarkdown and surfaced as an error.
+func (gen *Generator) themeTemplate(name string) *template.Template {
+	if t, ok := gen.templates[name]; ok {
+		return t
 	}
-
-	tmpl, err := template.New(file).Funcs(template.FuncMap{"now": time.Now}).Parse(string(templateString))
+	path := fmt.Sprintf("themes/%s/%s", gen.config.Site.Theme, name)
+	raw, err := afero.ReadFile(gen.Input, path)
 	if err != nil {
-		log.WithField("error", err).WithField("file", file).Fatal("Error parsing template")
+		panic(fmt.Errorf("reading template %s: %w", path, err))
 	}
+	t, err := template.New(name).Funcs(template.FuncMap{"now": time.Now}).Parse(string(raw))
+	if err != nil {
+		panic(fmt.Errorf("parsing template %s: %w", path, err))
+	}
+	gen.templates[name] = t
+	return t
+}
 
+// renderTheme executes the named (cached) theme template with data.
+func (gen *Generator) renderTheme(name string, data any) string {
 	var buf strings.Builder
-	err = tmpl.Execute(&buf, in)
-	if err != nil {
-		log.WithField("error", err).WithField("file", file).Fatal("Error executing template")
+	if err := gen.themeTemplate(name).Execute(&buf, data); err != nil {
+		panic(fmt.Errorf("executing template %s: %w", name, err))
 	}
 	return buf.String()
+}
+
+// renderInline parses and executes a one-off template string (e.g. post/KB content
+// that may itself contain template directives). Not cached, since the string varies
+// per item.
+func (gen *Generator) renderInline(label, tmplStr string, data any) string {
+	t, err := template.New(label).Funcs(template.FuncMap{"now": time.Now}).Parse(tmplStr)
+	if err != nil {
+		panic(fmt.Errorf("parsing %s template: %w", label, err))
+	}
+	var buf strings.Builder
+	if err := t.Execute(&buf, data); err != nil {
+		panic(fmt.Errorf("executing %s template: %w", label, err))
+	}
+	return buf.String()
+}
+
+// chrome renders the header/nav/footer shared by every page, with the given data.
+func (gen *Generator) chrome(data any) Page {
+	return Page{
+		Header: gen.renderTheme("header.html", data),
+		Nav:    gen.renderTheme("nav.html", data),
+		Footer: gen.renderTheme("footer.html", data),
+	}
+}
+
+func (gen *Generator) sortedPosts() []*Post {
+	posts := make([]*Post, 0, len(gen.Posts))
+	for _, post := range gen.Posts {
+		posts = append(posts, post)
+	}
+	sort.Slice(posts, func(i, j int) bool {
+		return posts[i].FrontMatter.OrigDate.After(posts[j].FrontMatter.OrigDate)
+	})
+	return posts
 }
 
 func (gen *Generator) generatePost(post Post) string {
-	postHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/post.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error read post template")
-	}
-
-	page := Page{
-		Header: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), post),
-		Nav:    generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), post),
-		Posts:  []*Post{&post},
-		Footer: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), post),
-	}
-
-	// if strings.Contains(post.FrontMatter.Slug, "bloat") {
-	// 	log.WithField("post", post.HTML).Info("Generated post")
-	// }
-
-	uttmpl, _ := template.New("utPage").Funcs(template.FuncMap{"now": time.Now}).Parse(post.HTML)
-	var templatedOut strings.Builder
-	err = uttmpl.Execute(&templatedOut, page)
-
-	post.HTML = templatedOut.String()
-
-	tmpl, err := template.New("page").Funcs(template.FuncMap{"now": time.Now}).Parse(string(postHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing post template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing post template")
-	}
-	return buf.String()
+	page := gen.chrome(post)
+	page.Posts = []*Post{&post}
+	// The post body may itself contain template directives referencing the page.
+	post.HTML = gen.renderInline("post content", post.HTML, page)
+	return gen.renderTheme("post.html", page)
 }
 
 func (gen *Generator) generateIndex() string {
-	indexHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/index.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading index template")
-	}
-
-	local_posts := []*Post{}
-	for _, post := range gen.Posts {
-		local_posts = append(local_posts, post)
-	}
-
-	sort.Slice(local_posts, func(i, j int) bool {
-		return local_posts[i].FrontMatter.OrigDate.After(local_posts[j].FrontMatter.OrigDate)
-	})
-
-	index := Page{
-		Header: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:    generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		Posts:  local_posts,
-		Footer: generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("index").Funcs(template.FuncMap{"now": time.Now}).Parse(string(indexHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing index template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, index)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing index template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.Posts = gen.sortedPosts()
+	return gen.renderTheme("index.html", page)
 }
 
 func (gen *Generator) generateFront() string {
-	frontHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/front.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading index template")
-	}
-
-	page := Page{
-		Header:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		SingleKB: gen.KBs["front"],
-		Footer:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("front").Funcs(template.FuncMap{"now": time.Now}).Parse(string(frontHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing index template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing index template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.SingleKB = gen.KBs["front"]
+	return gen.renderTheme("front.html", page)
 }
 
-func (gen *Generator) generatePage(page *StandalonePage) string {
-	pageHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/page.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading page template")
-	}
-
-	p := Page{
-		Header:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:        generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		SinglePage: page,
-		Footer:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("page").Funcs(template.FuncMap{"now": time.Now}).Parse(string(pageHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing page template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, p)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing page template")
-	}
-	return buf.String()
+func (gen *Generator) generatePage(standalone *StandalonePage) string {
+	page := gen.chrome(Post{})
+	page.SinglePage = standalone
+	return gen.renderTheme("page.html", page)
 }
 
 func (gen *Generator) generateKB(kb KB) string {
-	kbHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/kb.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error read post template")
-	}
-
-	page := Page{
-		Header:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), kb),
-		Nav:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), kb),
-		SingleKB: &kb,
-		Footer:   generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), kb),
-	}
-
-	// if strings.Contains(post.FrontMatter.Slug, "bloat") {
-	// 	log.WithField("post", post.HTML).Info("Generated post")
-	// }
-
-	uttmpl, _ := template.New("utPage").Funcs(template.FuncMap{"now": time.Now}).Parse(kb.HTML)
-	var templatedOut strings.Builder
-	err = uttmpl.Execute(&templatedOut, page)
-
-	kb.HTML = templatedOut.String()
-
-	tmpl, err := template.New("page").Funcs(template.FuncMap{"now": time.Now}).Parse(string(kbHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing post template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing post template")
-	}
-	return buf.String()
+	page := gen.chrome(kb)
+	page.SingleKB = &kb
+	// The KB body may itself contain template directives referencing the page.
+	kb.HTML = gen.renderInline("kb content", kb.HTML, page)
+	return gen.renderTheme("kb.html", page)
 }
 
 func (gen *Generator) generateKBIndex() string {
-	kbIndexHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/kb_index.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading kb_index template")
-	}
-
 	kbPages := []*KB{}
 	for _, kb := range gen.KBs {
 		if kb.FrontMatter.Slug != "front" {
 			kbPages = append(kbPages, kb)
 		}
 	}
-
 	sort.Slice(kbPages, func(i, j int) bool {
 		return kbPages[i].Path < kbPages[j].Path
 	})
 
-	page := Page{
-		Header:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		KBPages: kbPages,
-		Graph:   gen.generateKBGraph(),
-		Footer:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("kb_index").Funcs(template.FuncMap{"now": time.Now}).Parse(string(kbIndexHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing kb_index template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing kb_index template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.KBPages = kbPages
+	page.Graph = gen.generateKBGraph()
+	return gen.renderTheme("kb_index.html", page)
 }
 
 func (gen *Generator) generateGalleryIndex() string {
-	galleryHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/gallery_index.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading gallery_index template")
-	}
-
 	albums := []*Album{}
 	for _, album := range gen.Albums {
 		albums = append(albums, album)
@@ -277,58 +174,18 @@ func (gen *Generator) generateGalleryIndex() string {
 		return albums[i].Slug < albums[j].Slug
 	})
 
-	page := Page{
-		Header:        generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:           generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		GalleryAlbums: albums,
-		Footer:        generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("gallery_index").Funcs(template.FuncMap{"now": time.Now}).Parse(string(galleryHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing gallery_index template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing gallery_index template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.GalleryAlbums = albums
+	return gen.renderTheme("gallery_index.html", page)
 }
 
 func (gen *Generator) generateAlbumPage(album *Album) string {
-	albumHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/gallery_album.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading gallery_album template")
-	}
-
-	page := Page{
-		Header:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:         generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		SingleAlbum: album,
-		Footer:      generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("gallery_album").Funcs(template.FuncMap{"now": time.Now}).Parse(string(albumHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing gallery_album template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing gallery_album template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.SingleAlbum = album
+	return gen.renderTheme("gallery_album.html", page)
 }
 
 func (gen *Generator) generateTILIndex() string {
-	tilHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/til_index.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading til_index template")
-	}
-
 	tils := []*TIL{}
 	for _, til := range gen.TILs {
 		tils = append(tils, til)
@@ -337,32 +194,12 @@ func (gen *Generator) generateTILIndex() string {
 		return tils[i].FrontMatter.OrigDate.After(tils[j].FrontMatter.OrigDate)
 	})
 
-	page := Page{
-		Header:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		TILList: tils,
-		Footer:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("til_index").Funcs(template.FuncMap{"now": time.Now}).Parse(string(tilHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing til_index template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing til_index template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.TILList = tils
+	return gen.renderTheme("til_index.html", page)
 }
 
 func (gen *Generator) generateTagsPage() string {
-	tagsHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/tags.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading tags template")
-	}
-
 	allTags := map[string]int{}
 	for tag, posts := range gen.TaggedPosts {
 		allTags[tag] += len(posts)
@@ -374,53 +211,18 @@ func (gen *Generator) generateTagsPage() string {
 		allTags[tag] += len(tils)
 	}
 
-	page := Page{
-		Header:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		AllTags: allTags,
-		Footer:  generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("tags").Funcs(template.FuncMap{"now": time.Now}).Parse(string(tagsHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing tags template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing tags template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.AllTags = allTags
+	return gen.renderTheme("tags.html", page)
 }
 
 func (gen *Generator) generateTagList(tag string) string {
-	tagListHTML, err := afero.ReadFile(gen.Input, fmt.Sprintf("themes/%s/tag_list.html", gen.config.Site.Theme))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading tag_list template")
-	}
-
-	page := Page{
-		Header:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/header.html", gen.config.Site.Theme), Post{}),
-		Nav:        generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/nav.html", gen.config.Site.Theme), Post{}),
-		Posts:      gen.TaggedPosts[tag],
-		KBPages:    gen.TaggedKBs[tag],
-		TILList:    gen.TaggedTILs[tag],
-		CurrentTag: tag,
-		Footer:     generateTemplateHTML(gen.Input, fmt.Sprintf("themes/%s/footer.html", gen.config.Site.Theme), Post{}),
-	}
-
-	tmpl, err := template.New("tag_list").Funcs(template.FuncMap{"now": time.Now}).Parse(string(tagListHTML))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error parsing tag_list template")
-	}
-
-	var buf strings.Builder
-	err = tmpl.Execute(&buf, page)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error executing tag_list template")
-	}
-	return buf.String()
+	page := gen.chrome(Post{})
+	page.Posts = gen.TaggedPosts[tag]
+	page.KBPages = gen.TaggedKBs[tag]
+	page.TILList = gen.TaggedTILs[tag]
+	page.CurrentTag = tag
+	return gen.renderTheme("tag_list.html", page)
 }
 
 // Generate 5 line summary from the post html
@@ -434,63 +236,123 @@ func (gen *Generator) generateSummary(post *Post) {
 	post.Summary = strings.Join(splitHTML[:4], ".") + "..."
 }
 
-func (gen *Generator) generateFeeds() (string, string, string) {
-	feed := &feeds.Feed{
-		Title:       "my blog of thoughts and experiments",
-		Link:        &feeds.Link{Href: "https://yulian.kuncheff.com"},
-		Description: "Yulian Kuncheff's Blog",
+// baseURL is the site root used for absolute links in feeds.
+func (gen *Generator) baseURL() string {
+	domain := gen.config.Site.PrimaryDomain
+	if domain == "" {
+		domain = "localhost"
+	}
+	return "https://" + domain
+}
+
+func (gen *Generator) buildFeed(title, description string, items []*feeds.Item) *feeds.Feed {
+	return &feeds.Feed{
+		Title:       title,
+		Link:        &feeds.Link{Href: gen.baseURL()},
+		Description: description,
 		Author:      &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
-		Copyright:   fmt.Sprintf("© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> %s", strconv.Itoa(time.Now().Year())),
+		Copyright:   fmt.Sprintf("© <a href=\"https://github.com/daegalus\">Yulian Kuncheff</a> %d", time.Now().Year()),
 		Created:     time.Now(),
 		Language:    "en-us",
 		Generator:   "yblog",
+		Items:       items,
 	}
+}
 
+func (gen *Generator) postItems() []*feeds.Item {
 	var items []*feeds.Item
-
-	var posts []*Post
-	for _, post := range gen.Posts {
-		posts = append(posts, post)
-	}
-	sort.Slice(posts, func(i, j int) bool {
-		return posts[i].FrontMatter.OrigDate.After(posts[j].FrontMatter.OrigDate)
-	})
-
-	for _, post := range posts {
-		item := &feeds.Item{
-			Id:          fmt.Sprintf("https://yulian.kuncheff.com/blog/%s/", post.FrontMatter.Slug),
+	for _, post := range gen.sortedPosts() {
+		link := fmt.Sprintf("%s/blog/%s/", gen.baseURL(), post.FrontMatter.Slug)
+		items = append(items, &feeds.Item{
+			Id:          link,
 			Title:       post.FrontMatter.Title,
-			Link:        &feeds.Link{Href: fmt.Sprintf("https://yulian.kuncheff.com/blog/%s/", post.FrontMatter.Slug)},
+			Link:        &feeds.Link{Href: link},
 			Created:     post.FrontMatter.OrigDate,
 			Description: post.Summary,
 			Author:      &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
 			Content:     post.HTML,
-		}
-		items = append(items, item)
+		})
 	}
+	return items
+}
 
-	feed.Items = items
+func (gen *Generator) tilItems() []*feeds.Item {
+	tils := []*TIL{}
+	for _, til := range gen.TILs {
+		tils = append(tils, til)
+	}
+	sort.Slice(tils, func(i, j int) bool {
+		return tils[i].FrontMatter.OrigDate.After(tils[j].FrontMatter.OrigDate)
+	})
 
+	link := fmt.Sprintf("%s/til/", gen.baseURL())
+	var items []*feeds.Item
+	for _, til := range tils {
+		items = append(items, &feeds.Item{
+			Id:      fmt.Sprintf("%s#%s", link, til.FrontMatter.Slug),
+			Title:   til.FrontMatter.Title,
+			Link:    &feeds.Link{Href: link},
+			Created: til.FrontMatter.OrigDate,
+			Author:  &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
+			Content: til.HTML,
+		})
+	}
+	return items
+}
+
+func (gen *Generator) kbItems() []*feeds.Item {
+	kbs := []*KB{}
+	for _, kb := range gen.KBs {
+		if kb.FrontMatter.Slug != "front" {
+			kbs = append(kbs, kb)
+		}
+	}
+	sort.Slice(kbs, func(i, j int) bool {
+		return kbs[i].FrontMatter.OrigDate.After(kbs[j].FrontMatter.OrigDate)
+	})
+
+	var items []*feeds.Item
+	for _, kb := range kbs {
+		link := fmt.Sprintf("%s/kb/%s/", gen.baseURL(), kb.Path)
+		items = append(items, &feeds.Item{
+			Id:      link,
+			Title:   kb.FrontMatter.Title,
+			Link:    &feeds.Link{Href: link},
+			Created: kb.FrontMatter.OrigDate,
+			Author:  &feeds.Author{Name: "Yulian Kuncheff", Email: "yulian@kuncheff.com"},
+			Content: kb.HTML,
+		})
+	}
+	return items
+}
+
+// writeFeedSet writes atom, rss and json files for the feed under the given base name
+// (e.g. "feed" -> feed.atom/feed.rss/feed.json) in the output FS.
+func (gen *Generator) writeFeedSet(name string, feed *feeds.Feed) {
 	atom, err := feed.ToAtom()
 	if err != nil {
-		log.WithField("error", err).Fatal("Error generating atom feed")
+		panic(fmt.Errorf("generating %s atom feed: %w", name, err))
 	}
-
 	rss, err := feed.ToRss()
 	if err != nil {
-		log.WithField("error", err).Fatal("Error generating rss feed")
+		panic(fmt.Errorf("generating %s rss feed: %w", name, err))
 	}
-
-	jsonObj := &feeds.JSON{Feed: feed}
-	jsonFeedObj := jsonObj.JSONFeed()
-	jsonFeedObj.Extensions = append(jsonFeedObj.Extensions, &feeds.JSONExtensions{
-		Key:   "Generator",
-		Value: "yblog",
-	})
-	json, err := jsonObj.ToJSON()
+	json, err := (&feeds.JSON{Feed: feed}).ToJSON()
 	if err != nil {
-		log.WithField("error", err).Fatal("Error generating json feed")
+		panic(fmt.Errorf("generating %s json feed: %w", name, err))
 	}
+	afero.WriteFile(gen.Output, name+".atom", []byte(atom), fs.ModePerm)
+	afero.WriteFile(gen.Output, name+".rss", []byte(rss), fs.ModePerm)
+	afero.WriteFile(gen.Output, name+".json", []byte(json), fs.ModePerm)
+}
 
-	return atom, rss, json
+// generateFeeds writes the combined blog feed (feed.*) plus per-type feeds
+// (feed_blog.*, feed_til.*, feed_kb.*) to the output.
+func (gen *Generator) generateFeeds() {
+	blog := gen.buildFeed("Yulian Kuncheff — Blog", "my blog of thoughts and experiments", gen.postItems())
+	gen.writeFeedSet("feed", blog)
+	gen.writeFeedSet("feed_blog", blog)
+	gen.writeFeedSet("feed_til", gen.buildFeed("Yulian Kuncheff — TIL", "Today I Learned", gen.tilItems()))
+	gen.writeFeedSet("feed_kb", gen.buildFeed("Yulian Kuncheff — Knowledge Base", "Knowledge base / digital garden", gen.kbItems()))
+	log.Info("Generated feeds")
 }

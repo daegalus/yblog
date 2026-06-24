@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -19,7 +20,6 @@ import (
 
 	"yblog/data"
 	"yblog/handlers"
-	"yblog/utils"
 )
 
 var Version string
@@ -66,24 +66,27 @@ func loadConfig() data.Config {
 func copyFiles(input afero.Fs, output afero.Fs, rootPath string) {
 	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files during walk")
+			return err
 		}
 		if info.IsDir() {
 			return nil
 		}
 
-		input.MkdirAll(filepath.Dir(path), 0755)
-
 		in, err := afero.ReadFile(input, path)
 		if err != nil {
-			log.WithError(err).Fatal("Error reading file during walk")
+			log.WithError(err).WithField("file", path).Warn("Skipping file during walk: cannot read")
+			return nil
+		}
+		if err := output.MkdirAll(filepath.Dir(path), 0755); err != nil {
+			log.WithError(err).WithField("dir", filepath.Dir(path)).Warn("Skipping file during walk: cannot create directory")
+			return nil
 		}
 		afero.WriteFile(output, path, in, 0644)
 
 		return nil
 	})
 	if err != nil {
-		log.WithError(err).Fatal("Error walking files")
+		log.WithError(err).Error("Error walking files")
 	}
 }
 
@@ -98,8 +101,11 @@ func startServeWatcher(config data.Config, site *data.SiteState) {
 			case event := <-w.Event:
 				fmt.Println(event) // Print the event's info.
 				genNew, _ := initialize()
-				genNew.CompileMarkdown()
-				
+				if err := genNew.CompileMarkdown(); err != nil {
+					log.WithError(err).Error("Rebuild failed; keeping the previous version")
+					continue
+				}
+
 				site.Lock()
 				site.Generator = genNew
 				site.Unlock()
@@ -123,10 +129,6 @@ func startServeWatcher(config data.Config, site *data.SiteState) {
 		log.WithError(err).Fatal("Error watching contents folder")
 	}
 
-	// if err := w.Start(time.Second * 1); err != nil {
-	// 	log.WithError(err).Fatal("Error starting watcher")
-	// }
-
 	go w.Start(time.Second * 1)
 }
 
@@ -134,13 +136,13 @@ type Serve struct{}
 
 func (s *Serve) Run(ctx *Context) error {
 	generator, config := initialize()
-	generator.CompileMarkdown()
+	if err := generator.CompileMarkdown(); err != nil {
+		log.WithError(err).Fatal("Initial build failed")
+	}
 
 	site := &data.SiteState{
 		Generator: generator,
 	}
-
-	utils.CopyFiles(generator.Output, generator.Cache, ".", "", "./public")
 
 	startServeWatcher(*config, site)
 
@@ -178,13 +180,8 @@ func (s *Serve) Run(ctx *Context) error {
 	e.GET("", handlrs.IndexHandler)
 	e.GET("/", handlrs.IndexHandler)
 	e.GET("/blog", handlrs.BlogIndexHandler)
-	e.FileFS("/favicon.ico", "favicon.ico", afero.NewIOFS(generator.Output))
-	// e.FileFS("/index.xml", "/feed.atom", outputIO)
-	// e.FileFS("/feed.atom", "feed.atom", outputIO)
-	// e.FileFS("/feed.rss", "feed.rss", outputIO)
-	// e.FileFS("/feed.json", "feed.json", outputIO)
 	e.GET("/feed.:format", handlrs.FeedHandler)
-	e.GET("/feed_:type.:format", handlrs.SpecificFeedHandler)
+	e.GET("/feed_:name", handlrs.SpecificFeedHandler)
 	e.GET("/index.xml", handlrs.FeedHandler)
 	e.GET("/posts/:post", handlrs.PostHandler)
 	e.GET("/:post", handlrs.PostHandler)
@@ -249,9 +246,9 @@ type Deploy struct {
 
 func (d *Deploy) Run(ctx *Context) error {
 	generator, _ := initialize()
-	generator.CompileMarkdown()
-
-	utils.CopyFiles(generator.Output, generator.Cache, ".", "", d.OutputPath)
+	if err := generator.CompileMarkdown(); err != nil {
+		log.WithError(err).Fatal("Build failed")
+	}
 
 	osfs := afero.NewOsFs()
 	afero.Walk(generator.Output, ".", func(path string, info os.FileInfo, err error) error {
@@ -290,8 +287,17 @@ type New struct {
 	Title string `arg:"" help:"Title of the content"`
 }
 
+var slugNonAlphanumeric = regexp.MustCompile(`[^a-z0-9]+`)
+
+// slugify lowercases s and collapses runs of non-alphanumeric characters into single
+// hyphens, trimming any leading or trailing hyphens.
+func slugify(s string) string {
+	s = slugNonAlphanumeric.ReplaceAllString(strings.ToLower(s), "-")
+	return strings.Trim(s, "-")
+}
+
 func (n *New) Run(ctx *Context) error {
-	slug := strings.ToLower(strings.ReplaceAll(n.Title, " ", "-"))
+	slug := slugify(n.Title)
 	baseDir := map[string]string{
 		"post": "data/content/blog",
 		"kb":   "data/content/kb",

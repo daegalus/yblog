@@ -46,9 +46,8 @@ func (h *Handler) FeedHandler(c echo.Context) error {
 	format := c.Param("format")
 
 	if format != "atom" && format != "rss" && format != "json" && format != "" {
-		log.WithField("format", format).Fatal("Invalid feed format")
-		c.String(http.StatusNotFound, "")
-		return nil
+		log.WithField("format", format).Warn("Invalid feed format")
+		return c.String(http.StatusNotFound, "Not Found")
 	}
 
 	feedFilename := fmt.Sprintf("feed.%s", format)
@@ -60,21 +59,25 @@ func (h *Handler) FeedHandler(c echo.Context) error {
 }
 
 func (h *Handler) SpecificFeedHandler(c echo.Context) error {
-	feedType := c.Param("type")
-	format := c.Param("format")
-
-	if format != "atom" && format != "rss" && format != "json" && format != "xml" {
-		log.WithField("format", format).Fatal("Invalid feed format")
-		c.String(http.StatusNotFound, "")
-		return nil
+	// Echo can't bind two params separated by a literal "." in one segment, so the
+	// whole "<type>.<format>" is captured as one param and split here.
+	name := c.Param("name")
+	dot := strings.LastIndex(name, ".")
+	if dot <= 0 {
+		return c.String(http.StatusNotFound, "Not Found")
 	}
+	feedType, format := name[:dot], name[dot+1:]
 
 	if format == "xml" {
 		format = "atom" // Default xml explicitly to atom standard.
 	}
+	if format != "atom" && format != "rss" && format != "json" {
+		log.WithField("format", format).Warn("Invalid feed format")
+		return c.String(http.StatusNotFound, "Not Found")
+	}
 
 	feedFilename := fmt.Sprintf("feed_%s.%s", feedType, format)
-	log.WithField("file", feedFilename).Info("Serving explicit file")
+	log.WithField("file", feedFilename).Info("Serving explicit feed")
 	return h.ServeFile(c, feedFilename)
 }
 
@@ -111,31 +114,6 @@ func (h *Handler) PostHandler(c echo.Context) error {
 		return c.Redirect(http.StatusFound, fmt.Sprintf("%s%s", prefix, c.Request().URL.Path))
 	}
 }
-
-// func ImagesHandler(c echo.Context) error {
-// 	log.WithField("file", c.Request().URL.Path).Info("Serving file")
-
-// 	out, err := utils.ReadFile(data.Content, fmt.Sprintf("content/images/%s", strings.Replace(c.Request().URL.Path, "/images/", "", 1)))
-// 	if err != nil {
-// 		log.WithField("error", err).Fatal("Error reading file")
-// 		c.Error(err)
-// 		return err
-// 	}
-
-// 	fmt.Printf("out %s", string(out[:100]))
-
-// 	image.RegisterFormat("ico", "ico", ico.Decode, ico.DecodeConfig)
-// 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
-// 	_, format, err := image.Decode(bytes.NewReader(out))
-// 	if err != nil {
-// 		log.WithField("error", err).Fatal("Error decoding image")
-// 		c.Error(err)
-// 		return err
-// 	}
-
-// 	c.Blob(http.StatusOK, format, out)
-// 	return nil
-// }
 
 func (h *Handler) KBIndexHandler(c echo.Context) error {
 	log.WithField("file", "kb/index.html").Info("Serving KB index")

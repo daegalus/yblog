@@ -10,20 +10,14 @@ import (
 	"github.com/spf13/afero"
 )
 
-func ReadFile(fileSys afero.Fs, filename string) ([]byte, error) {
-	out, err := afero.ReadFile(fileSys, filename)
-	return out, err
-}
-
-func ReadFileToString(fileSys afero.Fs, filename string) (string, error) {
-	out, err := ReadFile(fileSys, filename)
-	return string(out), err
-}
-
+// CopyFiles walks rootPath in input and copies every file to output. When stripPrefix
+// is set the leading path segment is dropped and, if replacementPrefix is also set,
+// replaced with it. Individual file errors are logged and skipped rather than aborting
+// the whole copy.
 func CopyFiles(input afero.Fs, output afero.Fs, rootPath string, stripPrefix string, replacementPrefix string) {
 	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
-			log.WithError(err).Fatal("Error reading files during copyfiles walk")
+			return err
 		}
 		if info.IsDir() {
 			return nil
@@ -40,34 +34,21 @@ func CopyFiles(input afero.Fs, output afero.Fs, rootPath string, stripPrefix str
 			}
 		}
 
-		input.MkdirAll(filepath.Dir(path), 0755)
-
 		in, err := afero.ReadFile(input, path)
 		if err != nil {
-			log.WithError(err).Fatal("Error reading input file during copyFiles Walk")
+			log.WithError(err).WithField("file", path).Warn("Skipping file during copy: cannot read")
+			return nil
 		}
-		afero.WriteFile(output, targetPath, in, 0644)
-
-		return nil
-	})
-	if err != nil {
-		log.WithError(err).Fatal("Error walking files during copyFiles")
-	}
-}
-
-func PrintWalk(input afero.Fs, rootPath string) {
-	err := afero.Walk(input, rootPath, func(path string, info fs.FileInfo, err error) error {
-		if err != nil {
-			log.WithError(err).Fatal("Error reading files during walk")
+		if err := output.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+			log.WithError(err).WithField("dir", filepath.Dir(targetPath)).Warn("Skipping file during copy: cannot create directory")
+			return nil
 		}
-		if info.IsDir() {
-			log.WithField("type", "dir").WithField("path", path).Info("DebugWalk")
-		} else {
-			log.WithField("type", "file").WithField("path", path).Info("DebugWalk")
+		if err := afero.WriteFile(output, targetPath, in, 0644); err != nil {
+			log.WithError(err).WithField("file", targetPath).Warn("Failed to write file during copy")
 		}
 		return nil
 	})
 	if err != nil {
-		log.WithError(err).Fatal("Error walking files")
+		log.WithError(err).Error("Error walking files during copyFiles")
 	}
 }

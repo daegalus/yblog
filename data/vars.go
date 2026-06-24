@@ -9,11 +9,11 @@ import (
 type SiteState struct {
 	sync.RWMutex
 	Generator *Generator
-	Pages     map[string]*StandalonePage // Standalone root pages (e.g. /resume)
 }
 
 // all: prefix is required so dot-prefixed entries (e.g. content/static/.well-known)
 // are included in the embed; a plain "content" pattern skips files/dirs starting with "." or "_".
+//
 //go:embed all:content
 //go:embed themes
 var Content embed.FS
@@ -30,15 +30,15 @@ type Post struct {
 	HTML           string
 	Summary        string
 	LegacyComments []*LegacyComment
-	PrimaryDomain string
+	PrimaryDomain  string
 }
 
 type KB struct {
-	FrontMatter utils.FrontMatter
-	Tagsline    string
-	Path        string // relative path within kb (e.g., "devops/docker")
-	Markdown    []byte
-	HTML        string
+	FrontMatter   utils.FrontMatter
+	Tagsline      string
+	Path          string // relative path within kb (e.g., "devops/docker")
+	Markdown      []byte
+	HTML          string
 	Backlinks     []Backlink // paths of KB pages that link to this one
 	PrimaryDomain string
 }
@@ -78,16 +78,17 @@ type StandalonePage struct {
 	HTML        string
 }
 
-
-
-var ContentPrefix string = "content"
-var ThemesPrefix string = "themes"
-var CachePrefix string = "public"
+const (
+	ContentPrefix = "content"
+	// CachePrefix is the build output directory name, reused as the path prefix when
+	// restoring previously-generated images from the cache.
+	CachePrefix = "public"
+)
 
 type Config struct {
 	Site struct {
 		PrimaryDomain string `toml:"primary-domain"`
-		Theme  string `toml:"theme"`
-		Output string `toml:"output"`
+		Theme         string `toml:"theme"`
+		Output        string `toml:"output"`
 	} `toml:"site"`
 }

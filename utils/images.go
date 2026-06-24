@@ -5,7 +5,6 @@ import (
 	"image"
 	"image/draw"
 	"image/png"
-	"sync"
 
 	"github.com/caarlos0/log"
 	"github.com/gen2brain/avif"
@@ -38,29 +37,6 @@ func ImageToAVIF(original image.Image) []byte {
 	return buf.Bytes()
 }
 
-func ImageToAVIFThread(original image.Image, wg *sync.WaitGroup, returnChan chan []byte) {
-	defer wg.Done()
-	encodedImage := []byte{}
-	buf := bytes.NewBuffer(encodedImage)
-	options := avif.Options{
-		Quality:           50,
-		QualityAlpha:      50,
-		Speed:             4,
-		ChromaSubsampling: image.YCbCrSubsampleRatio420,
-	}
-
-	b := original.Bounds()
-	m := image.NewNRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
-	draw.Draw(m, m.Bounds(), original, b.Min, draw.Src)
-	err := avif.Encode(buf, m, options)
-
-	if err != nil {
-		log.WithError(err).Error("Failed to encode AVIF")
-	}
-
-	returnChan <- buf.Bytes()
-}
-
 func ImageToJXL(original image.Image) []byte {
 	encodedImage := []byte{}
 	buf := bytes.NewBuffer(encodedImage)
@@ -89,37 +65,6 @@ func ImageToWebP(original image.Image) []byte {
 		return nil
 	}
 	return buf.Bytes()
-}
-
-func ImageToWebPThreaded(original image.Image, wg *sync.WaitGroup, returnChan chan []byte) {
-	defer wg.Done()
-	encodedImage := []byte{}
-	buf := bytes.NewBuffer(encodedImage)
-	options := webp.Options{
-		Quality: 75,
-		Method:  6,
-	}
-	err := webp.Encode(buf, original, options)
-	if err != nil {
-		log.WithError(err).Error("Failed to encode WebP")
-	}
-	returnChan <- buf.Bytes()
-}
-
-func ImageFromWebP(fs afero.Fs, filepath string) image.Image {
-	webpImage, err := afero.ReadFile(fs, filepath)
-	if err != nil {
-		log.WithError(err).Error("Failed to read WebP file")
-		return nil
-	}
-
-	imageData, err := webp.Decode(bytes.NewBuffer(webpImage))
-	if err != nil {
-		log.WithError(err).Error("Failed to decode WebP")
-		return nil
-	}
-
-	return imageData
 }
 
 func ImageFromPNG(fs afero.Fs, filepath string) image.Image {

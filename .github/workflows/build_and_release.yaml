@@ -21,7 +21,14 @@ jobs:
         with:
           path: |
             public/images
-          key: images-${{ hashFiles('data/content/blog/images/**') }}
+            cache/images.json
+          # Key on the actual source images (they live in data/content/images, not
+          # data/content/blog/images — the old glob matched nothing). restore-keys
+          # falls back to the most recent cache so a single changed image doesn't
+          # discard everything; the build's per-image hash check re-encodes only what changed.
+          key: images-${{ hashFiles('data/content/images/**') }}
+          restore-keys: |
+            images-
 
       - name: Download Earthdate
         id: download-earthdate
@@ -47,6 +54,7 @@ jobs:
         with:
           path: |
             public/images
+            cache/images.json
           key: ${{ steps.restore-cached-images.outputs.cache-primary-key }}
   
 

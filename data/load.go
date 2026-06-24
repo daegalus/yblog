@@ -24,217 +24,86 @@ import (
 	fences "github.com/stefanfritsch/goldmark-fences"
 	"github.com/yuin/goldmark"
 	highlighting "github.com/yuin/goldmark-highlighting/v2"
-	meta "github.com/yuin/goldmark-meta"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-func threadEncode(returnChannel chan []byte, imageData image.Image, wg *sync.WaitGroup, encodeFunc func(image.Image) []byte) {
-	defer wg.Done()
-	encodedImage := encodeFunc(imageData)
-	returnChannel <- encodedImage
+// imageHashes holds the previously-saved and freshly-computed content hashes of the
+// source images, used to decide which images need re-encoding.
+type imageHashes struct {
+	saved   map[string]string
+	current map[string]string
 }
 
-func encodeFilesInDir(file fs.DirEntry, imageStoragePath string, postImageDir fs.DirEntry, gen *Generator, wg *sync.WaitGroup) {
-	defer wg.Done()
-	filename := strings.Split(file.Name(), ".")[0]
-	extension := strings.Split(file.Name(), ".")[1]
-	if extension != "png" {
+func (h imageHashes) changed(srcPath string) bool {
+	return h.current[srcPath] != h.saved[srcPath]
+}
+
+// encodeImage converts a single source PNG into avif/jxl/webp under images/<dir>/ in
+// the output FS. Formats that already exist are skipped when the source is unchanged
+// (the original PNG itself is copied to the output by convertImages). Each needed
+// format is encoded concurrently, then written sequentially.
+func (gen *Generator) encodeImage(imageStoragePath, dirName, fileName string, hashes imageHashes) {
+	if strings.ToLower(filepath.Ext(fileName)) != ".png" {
 		return
 	}
-	postImageDirPath := filepath.Join(ContentPrefix, imageStoragePath, postImageDir.Name())
-	postImagePath := filepath.Join(postImageDirPath, file.Name())
-	avifPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))
-	jxlPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))
-	webpPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))
-	pngPath := filepath.Join(imageStoragePath, postImageDir.Name(), file.Name())
+	base := strings.TrimSuffix(fileName, filepath.Ext(fileName))
+	srcPath := filepath.Join(ContentPrefix, imageStoragePath, dirName, fileName)
+	outDir := filepath.Join(imageStoragePath, dirName)
+	changed := hashes.changed(srcPath)
 
-	avifExists, _ := afero.Exists(gen.Output, avifPath)
-	jxlExists, _ := afero.Exists(gen.Output, jxlPath)
-	webpExists, _ := afero.Exists(gen.Output, webpPath)
-	pngExists, _ := afero.Exists(gen.Output, pngPath)
-
-	imageByteData, err := afero.ReadFile(gen.Input, postImagePath)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading image")
+	type encodeJob struct {
+		ext    string
+		encode func(image.Image) []byte
 	}
-
-	if !pngExists {
-		log.WithField("file", postImagePath).Info("PNG Doesn't Exist, writing data to output")
-		err := afero.WriteFile(gen.Output, pngPath, imageByteData, fs.ModePerm)
-		if err != nil {
-			log.WithField("error", err).Fatal("Error writing png to output")
+	var jobs []encodeJob
+	for _, job := range []encodeJob{
+		{"avif", utils.ImageToAVIF},
+		{"jxl", utils.ImageToJXL},
+		{"webp", utils.ImageToWebP},
+	} {
+		exists, _ := afero.Exists(gen.Output, filepath.Join(outDir, base+"."+job.ext))
+		if changed || !exists {
+			jobs = append(jobs, job)
 		}
 	}
-
-	savedImageHashes, _ := cache.LoadImageHashes()
-	currentHashes, _ := cache.CalculateImageHashes()
-
-	imageDifferent := currentHashes[postImagePath] != savedImageHashes[postImagePath]
-
-	if !imageDifferent {
-		if avifExists && jxlExists && webpExists && pngExists {
-			log.WithField("file", postImagePath).Info("Skipping encoding")
-			return // Skip encoding if the image is the same
-		}
-	}
-
-	imageData := utils.ImageFromPNG(afero.FromIOFS{FS: Content}, postImagePath)
-
-	var avifChan, jxlChan, webpChan chan []byte
-	if !avifExists || imageDifferent {
-		wg.Add(1)
-		avifChan = make(chan []byte)
-		go threadEncode(avifChan, imageData, wg, utils.ImageToAVIF)
-	}
-	if !jxlExists || imageDifferent {
-		wg.Add(1)
-		jxlChan = make(chan []byte)
-		go threadEncode(jxlChan, imageData, wg, utils.ImageToJXL)
-	}
-	if !webpExists || imageDifferent {
-		wg.Add(1)
-		webpChan = make(chan []byte)
-		go threadEncode(webpChan, imageData, wg, utils.ImageToWebP)
-	}
-
-	osFs := afero.NewOsFs()
-	localImagesDir := filepath.Join("data", ContentPrefix, imageStoragePath, postImageDir.Name())
-
-	for range 3 {
-		select {
-		case avifBytes, _ := <-avifChan:
-			outPath := filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))
-			log.WithField("file", outPath).Info("Converting to AVIF")
-			afero.WriteFile(gen.Output, outPath, avifBytes, fs.ModePerm)
-			if ok, _ := afero.Exists(osFs, localImagesDir); ok {
-				localPath := filepath.Join(localImagesDir, fmt.Sprintf("%s.%s", filename, "avif"))
-				if exists, _ := afero.Exists(osFs, localPath); !exists {
-					afero.WriteFile(osFs, localPath, avifBytes, fs.ModePerm)
-				}
-			}
-		case jxlBytes, _ := <-jxlChan:
-			outPath := filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))
-			log.WithField("file", outPath).Info("Converting to JXL")
-			afero.WriteFile(gen.Output, outPath, jxlBytes, fs.ModePerm)
-			if ok, _ := afero.Exists(osFs, localImagesDir); ok {
-				localPath := filepath.Join(localImagesDir, fmt.Sprintf("%s.%s", filename, "jxl"))
-				if exists, _ := afero.Exists(osFs, localPath); !exists {
-					afero.WriteFile(osFs, localPath, jxlBytes, fs.ModePerm)
-				}
-			}
-		case webpBytes, _ := <-webpChan:
-			outPath := filepath.Join("images", postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))
-			log.WithField("file", outPath).Info("Converting to WebP")
-			afero.WriteFile(gen.Output, outPath, webpBytes, fs.ModePerm)
-			if ok, _ := afero.Exists(osFs, localImagesDir); ok {
-				localPath := filepath.Join(localImagesDir, fmt.Sprintf("%s.%s", filename, "webp"))
-				if exists, _ := afero.Exists(osFs, localPath); !exists {
-					afero.WriteFile(osFs, localPath, webpBytes, fs.ModePerm)
-				}
-			}
-		}
-	}
-}
-
-func encodeFilesInDirSync(file fs.DirEntry, imageStoragePath string, postImageDir fs.DirEntry, gen *Generator) {
-	filename := strings.Split(file.Name(), ".")[0]
-	extension := strings.Split(file.Name(), ".")[1]
-	if extension != "png" {
+	if len(jobs) == 0 {
 		return
 	}
-	postImageDirPath := filepath.Join(ContentPrefix, imageStoragePath, postImageDir.Name())
-	postImagePath := filepath.Join(postImageDirPath, file.Name())
-	avifPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))
-	jxlPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))
-	webpPath := filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))
-	pngPath := filepath.Join(imageStoragePath, postImageDir.Name(), file.Name())
-	log.
-		WithField("avif", avifPath).
-		WithField("jxl", jxlPath).
-		WithField("webp", webpPath).
-		WithField("png", pngPath).
-		Info("Images in Post")
-	avifExists, _ := afero.Exists(gen.Output, avifPath)
-	jxlExists, _ := afero.Exists(gen.Output, jxlPath)
-	webpExists, _ := afero.Exists(gen.Output, webpPath)
-	pngExists, _ := afero.Exists(gen.Output, pngPath)
 
-	imageByteData, err := afero.ReadFile(gen.Input, postImagePath)
-	if err != nil {
-		log.WithField("error", err).Fatal("Error reading image")
+	img := utils.ImageFromPNG(afero.FromIOFS{FS: Content}, srcPath)
+	if img == nil {
+		return
 	}
 
-	if !pngExists {
-		log.WithField("file", postImagePath).Info("PNG Doesn't Exist, writing data to output")
-		err := afero.WriteFile(gen.Output, pngPath, imageByteData, fs.ModePerm)
-		if err != nil {
-			log.WithField("error", err).Fatal("Error writing png to output")
+	results := make([][]byte, len(jobs))
+	var wg sync.WaitGroup
+	for i, job := range jobs {
+		wg.Add(1)
+		go func(i int, job encodeJob) {
+			defer wg.Done()
+			results[i] = job.encode(img)
+		}(i, job)
+	}
+	wg.Wait()
+
+	for i, job := range jobs {
+		if results[i] == nil {
+			continue
 		}
-	}
-
-	savedImageHashes, _ := cache.LoadImageHashes()
-	currentHashes, _ := cache.CalculateImageHashes()
-
-	imageDifferent := currentHashes[postImagePath] != savedImageHashes[postImagePath]
-
-	if !imageDifferent {
-		if avifExists && jxlExists && webpExists && pngExists {
-			log.WithField("file", postImagePath).Info("Skipping encoding")
-			return // Skip encoding if the image is the same
-		}
-	}
-
-	imageData := utils.ImageFromPNG(afero.FromIOFS{FS: Content}, postImagePath)
-
-	if !avifExists || imageDifferent {
-		avifData := utils.ImageToAVIF(imageData)
-		log.WithField("file", filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif"))).Info("Converting to AVIF")
-		afero.WriteFile(gen.Output, filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "avif")), avifData, fs.ModePerm)
-	}
-
-	if !jxlExists || imageDifferent {
-		jxlData := utils.ImageToJXL(imageData)
-		log.WithField("file", filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl"))).Info("Converting to JXL")
-		afero.WriteFile(gen.Output, filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "jxl")), jxlData, fs.ModePerm)
-	}
-
-	if !webpExists || imageDifferent {
-		webpData := utils.ImageToWebP(imageData)
-		log.WithField("file", filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp"))).Info("Converting to WebP")
-		afero.WriteFile(gen.Output, filepath.Join(imageStoragePath, postImageDir.Name(), fmt.Sprintf("%s.%s", filename, "webp")), webpData, fs.ModePerm)
-	}
-}
-
-func encodeAllDirs(imageStoragePath string, imageStorageDirEntry fs.DirEntry, gen *Generator, wg *sync.WaitGroup, sem chan struct{}) {
-	defer wg.Done()
-	log.WithField("dir", imageStorageDirEntry.Name()).Info("Converting in Post")
-	if imageStorageDirEntry.IsDir() {
-		postImageDir, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath, imageStorageDirEntry.Name()))
-		for _, postImageFile := range postImageDir {
-			wg.Add(1)
-			go func(file fs.DirEntry) {
-				sem <- struct{}{}
-				defer func() { <-sem }()
-				encodeFilesInDir(file, imageStoragePath, imageStorageDirEntry, gen, wg)
-			}(postImageFile)
+		outPath := filepath.Join(outDir, base+"."+job.ext)
+		log.WithField("file", outPath).Infof("Converting to %s", strings.ToUpper(job.ext))
+		if err := afero.WriteFile(gen.Output, outPath, results[i], fs.ModePerm); err != nil {
+			log.WithError(err).WithField("file", outPath).Warn("Failed to write encoded image")
 		}
 	}
 }
 
-func encodeAllDirsSync(imageStoragePath string, imageStorageDirEntry fs.DirEntry, gen *Generator) {
-	log.WithField("dir", imageStorageDirEntry.Name()).Info("Converting in Post")
-	if imageStorageDirEntry.IsDir() {
-		postImageDir, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath, imageStorageDirEntry.Name()))
-		for _, postImageFile := range postImageDir {
-			encodeFilesInDirSync(postImageFile, imageStoragePath, imageStorageDirEntry, gen)
-		}
-	}
-}
-
-func (gen *Generator) CompileMarkdown() {
-	log.Info("Converting Images")
+// convertImages copies source images to the output, restores any cached encodes from
+// a previous build, and (re)encodes images whose source content changed. The per-image
+// content hashes are loaded and computed once, then persisted for incremental builds.
+func (gen *Generator) convertImages() {
 	imageStoragePath := "images"
 
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Output, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, "")
@@ -246,20 +115,58 @@ func (gen *Generator) CompileMarkdown() {
 	}
 	utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Cache, filepath.Join(ContentPrefix, imageStoragePath), ContentPrefix, CachePrefix)
 
-	imageStorageDirEntries, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath))
-	wg := sync.WaitGroup{}
+	saved, _ := cache.LoadImageHashes()
+	current, _ := cache.CalculateImageHashes()
+	hashes := imageHashes{saved: saved, current: current}
+
+	dirs, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath))
+	var wg sync.WaitGroup
 	sem := make(chan struct{}, runtime.NumCPU())
-	wg.Add(len(imageStorageDirEntries))
-	for _, imageStorageDirEntry := range imageStorageDirEntries {
-		go encodeAllDirs(imageStoragePath, imageStorageDirEntry, gen, &wg, sem)
+	for _, dir := range dirs {
+		if !dir.IsDir() {
+			continue
+		}
+		files, _ := fs.ReadDir(Content, filepath.Join(ContentPrefix, imageStoragePath, dir.Name()))
+		for _, file := range files {
+			wg.Add(1)
+			go func(dirName, fileName string) {
+				defer wg.Done()
+				sem <- struct{}{}
+				defer func() { <-sem }()
+				gen.encodeImage(imageStoragePath, dirName, fileName, hashes)
+			}(dir.Name(), file.Name())
+		}
 	}
 	wg.Wait()
+
+	if err := cache.SaveImageHashes(current); err != nil {
+		log.WithError(err).Warn("Failed to save image hashes")
+	}
+}
+
+func (gen *Generator) CompileMarkdown() (err error) {
+	// Template and feed generation panic on failure (e.g. a broken theme file);
+	// recover here so a bad build returns an error instead of taking down the
+	// process — important for the serve watcher, which keeps the last good build.
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("compile failed: %v", r)
+		}
+	}()
+
+	log.Info("Converting Images")
+	gen.convertImages()
+
+	if comments, cerr := GetLegacyComments(); cerr != nil {
+		log.WithError(cerr).Warn("Could not load legacy comments; continuing without them")
+	} else {
+		gen.legacyComments = comments
+	}
 
 	log.Info("Compiling markdown")
 	md := goldmark.New(
 		goldmark.WithExtensions(
 			extension.GFM,
-			meta.Meta,
 			highlighting.NewHighlighting(
 				highlighting.WithStyle("monokai"),
 				highlighting.WithGuessLanguage(true),
@@ -432,6 +339,7 @@ func (gen *Generator) CompileMarkdown() {
 	}
 
 	gen.generateFeeds()
+	return nil
 }
 
 // copyStaticPassthrough copies everything under content/static to the output root,
@@ -466,7 +374,7 @@ func (gen *Generator) copyStaticPassthrough() {
 		return afero.WriteFile(gen.Output, relPath, fileData, fs.ModePerm)
 	})
 	if err != nil {
-		log.WithField("error", err).Fatal("Error copying static passthrough files")
+		log.WithError(err).Error("Error copying static passthrough files")
 	}
 }
 
@@ -488,67 +396,33 @@ func sortChildrenComments(legacyComments []*LegacyComment) []*LegacyComment {
 }
 
 func (gen *Generator) CompileMarkdownFile(file fs.DirEntry, contentPath string, contentType string, md goldmark.Markdown) {
-	if !strings.Contains(file.Name(), ".md") {
+	if !strings.HasSuffix(file.Name(), ".md") {
 		return
 	}
 	data, err := Content.ReadFile(filepath.Join(contentPath, file.Name()))
 	if err != nil {
-		log.WithField("error", err).Fatal("Error reading file")
-		panic(err)
-	}
-
-	content, _, err := utils.StripFrontMatter(data)
-	if err != nil {
-		log.WithField("error", err).WithField("file", file.Name()).Error("Error stripping frontmatter, skipping file")
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping file: cannot read")
 		return
 	}
 
-	context := parser.NewContext()
+	body, frontmatter, err := utils.StripFrontMatter(data)
+	if err != nil {
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping file: bad frontmatter")
+		return
+	}
+
 	var out strings.Builder
-
-	err = md.Convert(data, &out, parser.WithContext(context))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error converting markdown")
-		panic(err)
-	}
-
-	metaData := meta.Get(context)
-
-	tagsInterface := metaData["tags"].([]interface{})
-	tagsStringList := make([]string, len(tagsInterface))
-	for i, v := range tagsInterface {
-		tagsStringList[i] = v.(string)
-	}
-
-	origDate, err := utils.ParseDate(metaData["date"].(string))
-	if err != nil {
-		log.WithField("error", err).WithField("file", file.Name()).Error("Error parsing date, skipping file")
+	if err := md.Convert(body, &out); err != nil {
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping file: markdown conversion failed")
 		return
-	}
-	modDate, err := utils.ModifyDate(metaData["date"].(string))
-	if err != nil {
-		log.WithField("error", err).WithField("file", file.Name()).Error("Error modifying date, skipping file")
-		return
-	}
-
-	frontmatter := utils.FrontMatter{
-		Author:   metaData["author"].(string),
-		OrigDate: origDate,
-		Date:     modDate,
-		Draft:    metaData["draft"].(bool),
-		Slug:     metaData["slug"].(string),
-		Title:    metaData["title"].(string),
-		Type:     metaData["type"].(string),
-		Tags:     tagsStringList,
 	}
 
 	switch contentType {
 	case "post":
-		gen.postSpecific(frontmatter, content, out.String())
+		gen.postSpecific(frontmatter, body, out.String())
 	case "til":
 		gen.tilSpecific(frontmatter, out.String())
 	}
-
 }
 
 func (gen *Generator) tilSpecific(frontmatter utils.FrontMatter, html string) {
@@ -573,111 +447,68 @@ func (gen *Generator) tilSpecific(frontmatter utils.FrontMatter, html string) {
 func (gen *Generator) CompileMarkdownFileKB(filePath string, kbPath string, md goldmark.Markdown) {
 	data, err := Content.ReadFile(filePath)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error reading file")
-		panic(err)
-	}
-
-	content, _, err := utils.StripFrontMatter(data)
-	if err != nil {
-		log.WithField("error", err).WithField("file", filePath).Error("Error stripping frontmatter, skipping file")
+		log.WithError(err).WithField("file", filePath).Warn("Skipping KB: cannot read")
 		return
 	}
 
-	context := parser.NewContext()
+	body, frontmatter, err := utils.StripFrontMatter(data)
+	if err != nil {
+		log.WithError(err).WithField("file", filePath).Warn("Skipping KB: bad frontmatter")
+		return
+	}
+
 	var out strings.Builder
-
-	err = md.Convert(data, &out, parser.WithContext(context))
-	if err != nil {
-		log.WithField("error", err).Fatal("Error converting markdown")
-		panic(err)
-	}
-
-	metaData := meta.Get(context)
-
-	tagsInterface := metaData["tags"].([]interface{})
-	tagsStringList := make([]string, len(tagsInterface))
-	for i, v := range tagsInterface {
-		tagsStringList[i] = v.(string)
-	}
-
-	origDate, err := utils.ParseDate(metaData["date"].(string))
-	if err != nil {
-		log.WithField("error", err).WithField("file", filePath).Error("Error parsing date, skipping file")
-		return
-	}
-	modDate, err := utils.ModifyDate(metaData["date"].(string))
-	if err != nil {
-		log.WithField("error", err).WithField("file", filePath).Error("Error modifying date, skipping file")
+	if err := md.Convert(body, &out); err != nil {
+		log.WithError(err).WithField("file", filePath).Warn("Skipping KB: markdown conversion failed")
 		return
 	}
 
-	frontmatter := utils.FrontMatter{
-		Author:   metaData["author"].(string),
-		OrigDate: origDate,
-		Date:     modDate,
-		Draft:    metaData["draft"].(bool),
-		Slug:     metaData["slug"].(string),
-		Title:    metaData["title"].(string),
-		Type:     metaData["type"].(string),
-		Tags:     tagsStringList,
-	}
-
-	gen.kbSpecific(frontmatter, content, out.String(), kbPath)
+	gen.kbSpecific(frontmatter, body, out.String(), kbPath)
 }
 
 func (gen *Generator) CompileMarkdownFilePage(file fs.DirEntry, contentPath string, md goldmark.Markdown) {
-	if !strings.Contains(file.Name(), ".md") {
+	if !strings.HasSuffix(file.Name(), ".md") {
 		return
 	}
 	data, err := Content.ReadFile(filepath.Join(contentPath, file.Name()))
 	if err != nil {
-		log.WithField("error", err).Fatal("Error reading page file")
-		panic(err)
-	}
-
-	_, _, err = utils.StripFrontMatter(data)
-	if err != nil {
-		log.WithField("error", err).WithField("file", file.Name()).Error("Error stripping frontmatter, skipping page file")
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping page: cannot read")
 		return
 	}
 
-	context := parser.NewContext()
-	var out strings.Builder
-
-	err = md.Convert(data, &out, parser.WithContext(context))
+	body, frontmatter, err := utils.StripFrontMatter(data)
 	if err != nil {
-		log.WithField("error", err).Fatal("Error converting page markdown")
-		panic(err)
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping page: bad frontmatter")
+		return
+	}
+	if frontmatter.Slug == "" {
+		log.WithField("file", file.Name()).Warn("Skipping page: missing slug")
+		return
 	}
 
-	metaData := meta.Get(context)
-	
-	frontmatter := utils.FrontMatter{
-		Author:   "",
-		Draft:    false,
-		Slug:     metaData["slug"].(string),
-		Title:    metaData["title"].(string),
-		Type:     "page",
+	var out strings.Builder
+	if err := md.Convert(body, &out); err != nil {
+		log.WithError(err).WithField("file", file.Name()).Warn("Skipping page: markdown conversion failed")
+		return
 	}
 
+	frontmatter.Type = "page"
 	page := StandalonePage{
 		FrontMatter: frontmatter,
 		HTML:        out.String(),
 	}
 
 	gen.Pages[frontmatter.Slug] = &page
-	
+
 	htmlOut := gen.generatePage(&page)
-	gen.Output.MkdirAll(fmt.Sprintf("%s", frontmatter.Slug), fs.ModeDir)
+	gen.Output.MkdirAll(frontmatter.Slug, fs.ModeDir)
 	afero.WriteFile(gen.Output, fmt.Sprintf("%s/index.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
 }
 
 func (gen *Generator) postSpecific(frontmatter utils.FrontMatter, content []byte, html string) {
-	legacyPostComments := GetLegacyComments()
-
 	legacyComments := []*LegacyComment{}
-	if _, ok := (*legacyPostComments)[frontmatter.Slug]; ok {
-		for _, comment := range *(*legacyPostComments)[frontmatter.Slug].Comments {
+	if post, ok := gen.legacyComments[frontmatter.Slug]; ok && post.Comments != nil {
+		for _, comment := range *post.Comments {
 			legacyComments = append(legacyComments, comment)
 		}
 	}
@@ -707,9 +538,8 @@ func (gen *Generator) postSpecific(frontmatter utils.FrontMatter, content []byte
 
 	htmlOut := gen.generatePost(post)
 
-	gen.Output.MkdirAll("posts", fs.ModeDir)
+	// afero's MemMapFs creates parent directories on write, so no MkdirAll is needed.
 	afero.WriteFile(gen.Output, fmt.Sprintf("blog/posts/%s.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
-	gen.Output.MkdirAll(fmt.Sprintf("$s", frontmatter.Slug), fs.ModeDir)
 	afero.WriteFile(gen.Output, fmt.Sprintf("blog/%s/index.html", frontmatter.Slug), []byte(htmlOut), fs.ModePerm)
 }
 

@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/adrg/frontmatter"
-	"github.com/caarlos0/log"
 )
+
+const dateLayout = "2006-01-02T15:04:05Z"
 
 type FrontMatter struct {
 	Author   string    `yaml:"author"`
@@ -19,14 +20,21 @@ type FrontMatter struct {
 	Tags     []string  `yaml:"tags"`
 }
 
+// StripFrontMatter parses the YAML/TOML/JSON frontmatter from data into a typed
+// FrontMatter and returns the remaining document body. When a date is present it
+// populates both OrigDate (parsed time, for sorting) and Date (formatted for display).
+// A parse error (including an invalid date) is returned so the caller can skip the file.
 func StripFrontMatter(data []byte) ([]byte, FrontMatter, error) {
 	var matter FrontMatter
 	rest, err := frontmatter.Parse(bytes.NewReader(data), &matter)
 	if err != nil {
-		log.WithField("error", err).Error("Error parsing frontmatter")
 		return nil, matter, err
 	}
 	if matter.Date != "" {
+		matter.OrigDate, err = ParseDate(matter.Date)
+		if err != nil {
+			return nil, matter, err
+		}
 		matter.Date, err = ModifyDate(matter.Date)
 		if err != nil {
 			return nil, matter, err
@@ -35,24 +43,16 @@ func StripFrontMatter(data []byte) ([]byte, FrontMatter, error) {
 	return rest, matter, nil
 }
 
-func ModifyDate(date string) (string, error) {
-	layout := "2006-01-02T15:04:05Z"
-	t, err := time.Parse(layout, date)
-	if err != nil {
-		log.WithField("error", err).WithField("date", date).Error("Error modifying date")
-		return "", err
-	}
-
-	return t.Format("January 2, 2006 | 15:04"), nil
+// ParseDate parses a frontmatter date in the canonical layout.
+func ParseDate(date string) (time.Time, error) {
+	return time.Parse(dateLayout, date)
 }
 
-func ParseDate(date string) (time.Time, error) {
-	layout := "2006-01-02T15:04:05Z"
-	t, err := time.Parse(layout, date)
+// ModifyDate parses a frontmatter date and reformats it for display.
+func ModifyDate(date string) (string, error) {
+	t, err := ParseDate(date)
 	if err != nil {
-		log.WithField("error", err).WithField("date", date).Error("Error parsing date")
-		return time.Time{}, err
+		return "", err
 	}
-
-	return t, nil
+	return t.Format("January 2, 2006 | 15:04"), nil
 }

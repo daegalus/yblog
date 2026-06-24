@@ -3,3 +3,6 @@ public/
 deploy/
 .claude/
 .codex/
+
+# Build cache (image content hashes); regenerated each build, cached in CI.
+cache/images.json

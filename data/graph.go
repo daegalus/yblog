@@ -7,11 +7,11 @@ import (
 )
 
 type Node struct {
-	ID    string
-	X     float64
-	Y     float64
-	Vx    float64
-	Vy    float64
+	ID string
+	X  float64
+	Y  float64
+	Vx float64
+	Vy float64
 }
 
 type Edge struct {

@@ -1,10 +1,8 @@
 package cache
 
 import (
-	"bufio"
 	"encoding/hex"
 	"encoding/json"
-	"io"
 	"os"
 	"path/filepath"
 
@@ -89,26 +87,10 @@ func CalculateImageHashes() (map[string]string, error) {
 }
 
 func HashFile(filePath string) (string, error) {
-	// Open the file
-	file, err := os.Open(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err
 	}
-	defer file.Close()
-
-	// Read the data from the opened file
-	reader := bufio.NewReader(file)
-	bytes, _ := io.ReadAll(reader)
-
-	// Calculate the hash of the file using Blake2b
-	hash := xxh3.Hash128(bytes).Bytes()
-
-	uHash := []byte{}
-	for _, b := range hash {
-		uHash = append(uHash, b)
-	}
-
-	hashString := hex.EncodeToString(uHash)
-
-	return hashString, nil
+	hash := xxh3.Hash128(data).Bytes()
+	return hex.EncodeToString(hash[:]), nil
 }
