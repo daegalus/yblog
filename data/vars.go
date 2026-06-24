@@ -12,7 +12,9 @@ type SiteState struct {
 	Pages     map[string]*StandalonePage // Standalone root pages (e.g. /resume)
 }
 
-//go:embed content
+// all: prefix is required so dot-prefixed entries (e.g. content/static/.well-known)
+// are included in the embed; a plain "content" pattern skips files/dirs starting with "." or "_".
+//go:embed all:content
 //go:embed themes
 var Content embed.FS
 

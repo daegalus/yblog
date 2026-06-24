@@ -51,7 +51,9 @@ jobs:
   
 
       - name: "Compress"
-        run: tar -cJf website.tar.zst public/*
+        # Archive the dir itself, not public/* — the shell glob skips dotfiles,
+        # which would drop passthrough entries like public/.well-known from the release.
+        run: tar -cJf website.tar.zst public
 
       - name: Release
         uses: softprops/action-gh-release@v2

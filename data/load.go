@@ -334,6 +334,10 @@ func (gen *Generator) CompileMarkdown() {
 		utils.CopyFiles(afero.FromIOFS{FS: Content}, gen.Output, contentPathHistorical, ContentPrefix, "")
 	}
 
+	// Copy static passthrough files verbatim to the output root, preserving hierarchy.
+	// e.g. content/static/.well-known/oauth-authorization-server -> /.well-known/oauth-authorization-server
+	gen.copyStaticPassthrough()
+
 	// Load gallery albums
 	contentPathGallery := "content/gallery"
 	albumDirs, err := fs.ReadDir(Content, contentPathGallery)
@@ -428,6 +432,42 @@ func (gen *Generator) CompileMarkdown() {
 	}
 
 	gen.generateFeeds()
+}
+
+// copyStaticPassthrough copies everything under content/static to the output root,
+// stripping the content/static prefix and preserving the remaining folder hierarchy.
+// This is for files that must be served verbatim at the site root (e.g. /.well-known/*,
+// robots.txt, IndieAuth/OAuth metadata). No templating or processing is applied.
+func (gen *Generator) copyStaticPassthrough() {
+	staticRoot := filepath.Join(ContentPrefix, "static")
+	if ok, _ := afero.Exists(afero.FromIOFS{FS: Content}, staticRoot); !ok {
+		return
+	}
+
+	err := fs.WalkDir(Content, staticRoot, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+
+		relPath, err := filepath.Rel(staticRoot, path)
+		if err != nil {
+			return err
+		}
+
+		fileData, err := Content.ReadFile(path)
+		if err != nil {
+			return err
+		}
+
+		gen.Output.MkdirAll(filepath.Dir(relPath), fs.ModeDir)
+		return afero.WriteFile(gen.Output, relPath, fileData, fs.ModePerm)
+	})
+	if err != nil {
+		log.WithField("error", err).Fatal("Error copying static passthrough files")
+	}
 }
 
 func sortComments(legacyComments []*LegacyComment) []*LegacyComment {

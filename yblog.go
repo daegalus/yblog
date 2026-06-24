@@ -213,6 +213,28 @@ func (s *Serve) Run(ctx *Context) error {
 	e.GET("/bookmarks", func(c echo.Context) error {
 		return c.Redirect(http.StatusFound, "https://links.mistlyric.net")
 	})
+
+	// Passthrough routes for content/static, served at the site root (deploy serves
+	// these as plain files). Top-level files map to "/name"; top-level dirs to "/name/*".
+	// These explicit routes take precedence over the "/:post" catch-all. Files are served
+	// live from the regenerated output FS, so edits within an existing dir take effect on
+	// rebuild; adding a NEW top-level entry requires a serve restart to register its route.
+	staticRoot := filepath.Join(data.ContentPrefix, "static")
+	if entries, err := fs.ReadDir(data.Content, staticRoot); err == nil {
+		for _, entry := range entries {
+			name := entry.Name()
+			if entry.IsDir() {
+				e.GET(fmt.Sprintf("/%s/*", name), func(c echo.Context) error {
+					return handlrs.ServeFile(c, strings.TrimPrefix(c.Request().URL.Path, "/"))
+				})
+			} else {
+				e.GET(fmt.Sprintf("/%s", name), func(c echo.Context) error {
+					return handlrs.ServeFile(c, name)
+				})
+			}
+		}
+	}
+
 	if err := e.Start(":8080"); err != nil {
 		log.WithError(err).Fatal("Failed to start server")
 	}

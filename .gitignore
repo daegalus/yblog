@@ -1,3 +1,5 @@
 build/
 public/
 deploy/
+.claude/
+.codex/
