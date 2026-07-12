@@ -13,11 +13,11 @@ jobs:
   create_release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Restore cached images
         id: restore-cached-images
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: |
             public/images
@@ -41,7 +41,7 @@ jobs:
         id: earthdate
         run: echo "earthdate=$(./earthdate)" >> $GITHUB_OUTPUT
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: stable
       
@@ -50,7 +50,7 @@ jobs:
 
       - name: Save image cache
         id: save-image-cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: |
             public/images
@@ -64,7 +64,7 @@ jobs:
         run: tar -cJf website.tar.zst public
 
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ steps.earthdate.outputs.earthdate }}
           tag_name: ${{ steps.earthdate.outputs.earthdate }}
