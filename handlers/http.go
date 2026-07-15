@@ -7,7 +7,7 @@ import (
 	"yblog/data"
 
 	"github.com/caarlos0/log"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type Handler struct {
@@ -22,7 +22,7 @@ func NewHandlers(config *data.Config, state *data.SiteState) *Handler {
 	}
 }
 
-func (h *Handler) ServeFile(c echo.Context, filePath string) error {
+func (h *Handler) ServeFile(c *echo.Context, filePath string) error {
 	h.state.RLock()
 	outFS := h.state.Generator.Output
 	h.state.RUnlock()
@@ -42,7 +42,7 @@ func (h *Handler) ServeFile(c echo.Context, filePath string) error {
 	return nil
 }
 
-func (h *Handler) FeedHandler(c echo.Context) error {
+func (h *Handler) FeedHandler(c *echo.Context) error {
 	format := c.Param("format")
 
 	if format != "atom" && format != "rss" && format != "json" && format != "" {
@@ -58,7 +58,7 @@ func (h *Handler) FeedHandler(c echo.Context) error {
 	return h.ServeFile(c, feedFilename)
 }
 
-func (h *Handler) SpecificFeedHandler(c echo.Context) error {
+func (h *Handler) SpecificFeedHandler(c *echo.Context) error {
 	// Echo can't bind two params separated by a literal "." in one segment, so the
 	// whole "<type>.<format>" is captured as one param and split here.
 	name := c.Param("name")
@@ -81,17 +81,17 @@ func (h *Handler) SpecificFeedHandler(c echo.Context) error {
 	return h.ServeFile(c, feedFilename)
 }
 
-func (h *Handler) BlogIndexHandler(c echo.Context) error {
+func (h *Handler) BlogIndexHandler(c *echo.Context) error {
 	log.WithField("file", "blog/index.html").Info("Serving file")
 	return h.ServeFile(c, "blog/index.html")
 }
 
-func (h *Handler) IndexHandler(c echo.Context) error {
+func (h *Handler) IndexHandler(c *echo.Context) error {
 	log.WithField("file", "index.html").Info("Serving file")
 	return h.ServeFile(c, "index.html")
 }
 
-func (h *Handler) PostHandler(c echo.Context) error {
+func (h *Handler) PostHandler(c *echo.Context) error {
 	prefix := "/blog"
 	slug := c.Param("post")
 
@@ -115,12 +115,12 @@ func (h *Handler) PostHandler(c echo.Context) error {
 	}
 }
 
-func (h *Handler) KBIndexHandler(c echo.Context) error {
+func (h *Handler) KBIndexHandler(c *echo.Context) error {
 	log.WithField("file", "kb/index.html").Info("Serving KB index")
 	return h.ServeFile(c, "kb/index.html")
 }
 
-func (h *Handler) KBHandler(c echo.Context) error {
+func (h *Handler) KBHandler(c *echo.Context) error {
 	// Wildcard param captures the full nested path, e.g., "devops/docker"
 	pagePath := c.Param("*")
 	if pagePath == "" {
@@ -135,12 +135,12 @@ func (h *Handler) KBHandler(c echo.Context) error {
 	return h.ServeFile(c, filePath)
 }
 
-func (h *Handler) GalleryIndexHandler(c echo.Context) error {
+func (h *Handler) GalleryIndexHandler(c *echo.Context) error {
 	log.WithField("file", "gallery/index.html").Info("Serving gallery index")
 	return h.ServeFile(c, "gallery/index.html")
 }
 
-func (h *Handler) GalleryHandler(c echo.Context) error {
+func (h *Handler) GalleryHandler(c *echo.Context) error {
 	pagePath := c.Param("*")
 	if pagePath == "" {
 		return h.GalleryIndexHandler(c)
@@ -153,12 +153,12 @@ func (h *Handler) GalleryHandler(c echo.Context) error {
 	return h.ServeFile(c, filePath)
 }
 
-func (h *Handler) TILHandler(c echo.Context) error {
+func (h *Handler) TILHandler(c *echo.Context) error {
 	log.WithField("file", "til/index.html").Info("Serving TIL index")
 	return h.ServeFile(c, "til/index.html")
 }
 
-func (h *Handler) TagsHandler(c echo.Context) error {
+func (h *Handler) TagsHandler(c *echo.Context) error {
 	tag := c.Param("tag")
 	if tag == "" {
 		// Serve tags index page
