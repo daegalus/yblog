@@ -13,8 +13,8 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/alecthomas/kong"
 	"github.com/caarlos0/log"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/labstack/echo/v5"
+	"github.com/labstack/echo/v5/middleware"
 	"github.com/radovskyb/watcher"
 	"github.com/spf13/afero"
 
@@ -157,7 +157,7 @@ func (s *Serve) Run(ctx *Context) error {
 		LogRemoteIP:     true,
 		LogRoutePath:    true,
 		LogResponseSize: true,
-		LogValuesFunc: func(c echo.Context, values middleware.RequestLoggerValues) error {
+		LogValuesFunc: func(c *echo.Context, values middleware.RequestLoggerValues) error {
 			log.WithField("method", values.Method).
 				WithField("client_ip", values.RemoteIP).
 				WithField("latency", values.Latency.Microseconds()).
@@ -173,8 +173,6 @@ func (s *Serve) Run(ctx *Context) error {
 	e.Use(middleware.Recover())
 	e.Use(middleware.RequestID())
 	e.Use(middleware.Gzip())
-	e.HideBanner = true
-
 	handlrs := handlers.NewHandlers(config, site)
 
 	e.GET("", handlrs.IndexHandler)
@@ -188,7 +186,7 @@ func (s *Serve) Run(ctx *Context) error {
 	e.GET("/tags/:tag", handlrs.TagsHandler)
 	e.GET("/kb", handlrs.KBIndexHandler)
 	e.GET("/kb/*", handlrs.KBHandler)
-	e.GET("/historical/*", func(c echo.Context) error {
+	e.GET("/historical/*", func(c *echo.Context) error {
 		filePath := c.Param("*")
 		if filePath == "" {
 			return c.String(http.StatusNotFound, "Not Found")
@@ -197,17 +195,17 @@ func (s *Serve) Run(ctx *Context) error {
 	})
 	e.GET("/gallery", handlrs.GalleryIndexHandler)
 	e.GET("/gallery/*", handlrs.GalleryHandler)
-	e.GET("/images/*", func(c echo.Context) error {
+	e.GET("/images/*", func(c *echo.Context) error {
 		filePath := c.Param("*")
 		if filePath == "" {
 			return c.String(http.StatusNotFound, "Not Found")
 		}
 		return handlrs.ServeFile(c, fmt.Sprintf("images/%s", filePath))
 	})
-	e.GET("/favicon.ico", func(c echo.Context) error {
+	e.GET("/favicon.ico", func(c *echo.Context) error {
 		return handlrs.ServeFile(c, "favicon.ico")
 	})
-	e.GET("/bookmarks", func(c echo.Context) error {
+	e.GET("/bookmarks", func(c *echo.Context) error {
 		return c.Redirect(http.StatusFound, "https://links.mistlyric.net")
 	})
 
@@ -221,11 +219,11 @@ func (s *Serve) Run(ctx *Context) error {
 		for _, entry := range entries {
 			name := entry.Name()
 			if entry.IsDir() {
-				e.GET(fmt.Sprintf("/%s/*", name), func(c echo.Context) error {
+				e.GET(fmt.Sprintf("/%s/*", name), func(c *echo.Context) error {
 					return handlrs.ServeFile(c, strings.TrimPrefix(c.Request().URL.Path, "/"))
 				})
 			} else {
-				e.GET(fmt.Sprintf("/%s", name), func(c echo.Context) error {
+				e.GET(fmt.Sprintf("/%s", name), func(c *echo.Context) error {
 					return handlrs.ServeFile(c, name)
 				})
 			}
