@@ -29,9 +29,9 @@ require (
 	github.com/tetratelabs/wazero v1.12.0 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
-	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/adrg/frontmatter v0.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
-	github.com/alecthomas/kong v1.15.0
+	github.com/alecthomas/kong v1.16.0
 	github.com/caarlos0/log v0.6.2
 	github.com/daegalus/feeds v1.3.3
 	github.com/daegalus/xxh3 v0.0.0-20250309091422-cb810300c3b8
@@ -50,7 +50,7 @@ require (
 	github.com/gen2brain/jpegxl v0.6.0
 	github.com/gen2brain/webp v0.6.4
 	github.com/grokify/html-strip-tags-go v0.1.0
-	github.com/labstack/echo/v5 v5.3.0
+	github.com/labstack/echo/v5 v5.3.1
 	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/afero v1.15.0
 	github.com/stefanfritsch/goldmark-fences v1.0.0
