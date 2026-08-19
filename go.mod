@@ -2,7 +2,7 @@ module yblog
 
 go 1.25.0
 
-toolchain go1.26.5
+toolchain go1.27.0
 
 require (
 	charm.land/lipgloss/v2 v2.0.3 // indirect
@@ -42,7 +42,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/adrg/frontmatter v0.2.0
 	github.com/alecthomas/chroma/v2 v2.27.0
-	github.com/alecthomas/kong v1.16.0
+	github.com/alecthomas/kong v1.16.1
 	github.com/caarlos0/log v0.6.2
 	github.com/daegalus/feeds v1.3.3
 	github.com/daegalus/xxh3 v0.0.0-20250309091422-cb810300c3b8
