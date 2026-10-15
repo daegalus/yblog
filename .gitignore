@@ -6,3 +6,4 @@ deploy/
 
 # Build cache (image content hashes); regenerated each build, cached in CI.
 cache/images.json
+.bunny/

@@ -1,6 +1,7 @@
 name: Build and Release
 
 on:
+  pull_request:
   workflow_dispatch:
   push:
     branches:
@@ -8,6 +9,11 @@ on:
 
 permissions:
   contents: write
+  deployments: write
+
+concurrency:
+  group: bunny-sites-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   create_release:
@@ -59,11 +65,13 @@ jobs:
   
 
       - name: "Compress"
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         # Archive the dir itself, not public/* — the shell glob skips dotfiles,
         # which would drop passthrough entries like public/.well-known from the release.
         run: tar -cJf website.tar.zst public
 
       - name: Release
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v3
         with:
           name: ${{ steps.earthdate.outputs.earthdate }}
@@ -71,7 +79,18 @@ jobs:
           files: |
             website.tar.zst
 
-      - name: "Post Request to Statichost.eu builder"
-        run: |
-          curl -X POST https://builder.statichost.eu/digital-garden
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: public
+          include-hidden-files: true
+          retention-days: 7
+
+      - uses: BunnyWay/actions/deploy-site@deploy-site_0.1.1
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          site: digital-garden
+          directory: public
+          api_key: ${{ secrets.BUNNYNET_API_KEY }}
+          cli_version: "0.19.0"
 
