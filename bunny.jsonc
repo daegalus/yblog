@@ -1,0 +1,8 @@
+{
+  "sites": {
+    "name": "digital-garden",
+    "build": "go run yblog.go deploy",
+    "dir": "public",
+    "spa": false
+  }
+}
