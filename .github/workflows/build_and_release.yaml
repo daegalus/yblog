@@ -50,6 +50,13 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: stable
+
+      - name: Install native image encoders
+        # The Go encoders use these when present, avoiding expensive WASM
+        # fallback work on an empty GitHub Actions image cache.
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libavif-dev libjxl-dev libwebp-dev
       
       - name: "Build"
         run: go run yblog.go deploy
