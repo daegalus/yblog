@@ -2,7 +2,7 @@ module yblog
 
 go 1.25.0
 
-toolchain go1.27.1
+toolchain go1.27.3
 
 require (
 	charm.land/lipgloss/v2 v2.0.3 // indirect
@@ -50,7 +50,7 @@ require (
 	github.com/gen2brain/jpegxl v0.6.0
 	github.com/gen2brain/webp v0.6.4
 	github.com/grokify/html-strip-tags-go v0.1.0
-	github.com/labstack/echo/v5 v5.4.0
+	github.com/labstack/echo/v5 v5.4.2
 	github.com/radovskyb/watcher v1.0.7
 	github.com/spf13/afero v1.15.0
 	github.com/stefanfritsch/goldmark-fences v1.0.0
